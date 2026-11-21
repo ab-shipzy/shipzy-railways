@@ -25,11 +25,12 @@ export default function RootLayout({ children }) {
               </div>
             </div>
           </div>
-          <nav className="flex-1 px-3 py-4 space-y-0.5 text-[13px]">
+          <nav className="flex-1 px-3 py-4 space-y-0.5 text-[13px] overflow-y-auto">
             <Link href="/" className="flex items-center gap-2.5 px-3 py-2 rounded-md hover:bg-white/10 transition text-slate-200 hover:text-white">Dashboard</Link>
             <Link href="/booking" className="flex items-center gap-2.5 px-3 py-2 rounded-md hover:bg-white/10 transition text-slate-200 hover:text-white">New Booking</Link>
             <Link href="/shipments" className="flex items-center gap-2.5 px-3 py-2 rounded-md hover:bg-white/10 transition text-slate-200 hover:text-white">Shipments</Link>
             <Link href="/customers" className="flex items-center gap-2.5 px-3 py-2 rounded-md hover:bg-white/10 transition text-slate-200 hover:text-white">Customers</Link>
+            <div className="pt-4 pb-1 px-3 text-[10px] uppercase tracking-wider text-slate-400">Settings</div>
             <Link href="/warehouses" className="flex items-center gap-2.5 px-3 py-2 rounded-md hover:bg-white/10 transition text-slate-200 hover:text-white">Warehouses</Link>
           </nav>
           <div className="px-5 py-4 text-[11px] text-slate-400 border-t border-white/10">
@@ -38,14 +39,20 @@ export default function RootLayout({ children }) {
         </aside>
 
         <div className="flex-1 ml-60">
-          <header className="bg-white border-b border-[#e5e7eb] px-8 py-3.5 flex justify-between items-center sticky top-0 z-20">
-            <div className="text-sm text-slate-500">Railway logistics operations</div>
-            <div className="flex items-center gap-2 text-xs">
+          <header className="bg-white border-b border-[#e5e7eb] px-6 py-3 flex justify-between items-center sticky top-0 z-20 gap-4">
+            <div className="flex-1 max-w-md">
+              <input
+                type="search"
+                placeholder="Search shipments, customers, warehouses..."
+                className="w-full border border-[#e5e7eb] rounded-md px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0074ff]/30"
+              />
+            </div>
+            <div className="flex items-center gap-3 text-xs">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
               <span className="text-emerald-700 font-medium">System healthy</span>
             </div>
           </header>
-          <main className="p-8">{children}</main>
+          <main className="p-6">{children}</main>
         </div>
       </body>
     </html>
