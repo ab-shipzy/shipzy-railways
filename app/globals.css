@@ -2,17 +2,41 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --brand: #0074ff;
+  --brand-deep: #0058c4;
+  --brand-soft: #e6f1ff;
+  --navy: #00304a;
+  --ink: #0f172a;
+  --ink-2: #334155;
+  --ink-3: #64748b;
+  --bg: #f7f8fa;
+  --surface: #ffffff;
+  --line: #e5e7eb;
+  --ok: #059669;
+  --ok-soft: #ecfdf5;
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  font-size: 13px;
+}
+
+.mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+
 @layer components {
   .card {
-    @apply bg-white border border-slate-200 rounded-lg shadow-sm;
+    @apply bg-white border border-[#e5e7eb] rounded-lg shadow-sm;
   }
   .btn-primary {
-    @apply bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition;
+    @apply bg-[#0074ff] hover:bg-[#0058c4] text-white px-4 py-2 rounded-md text-sm font-semibold transition;
   }
   .btn-success {
-    @apply bg-emerald-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-emerald-700 transition;
+    @apply bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-md text-sm font-medium transition;
   }
   .input {
-    @apply w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500;
+    @apply w-full border border-[#e5e7eb] rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0074ff]/30 focus:border-[#0074ff];
   }
 }
