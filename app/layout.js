@@ -16,25 +16,13 @@ export default function RootLayout({ children }) {
       </head>
       <body style={{ margin: 0, fontFamily: 'Plus Jakarta Sans, system-ui, sans-serif', background: '#f7f8fa' }}>
         {sidebarOpen && (
-          <div
-            onClick={() => setSidebarOpen(false)}
-            style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 40 }}
-          />
+          <div onClick={() => setSidebarOpen(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 40 }} />
         )}
 
         <aside style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          height: '100%',
-          width: 240,
-          background: '#00304a',
-          color: '#e2e8f0',
-          zIndex: 50,
-          transform: sidebarOpen ? 'translateX(0)' : 'translateX(-100%)',
-          transition: 'transform 0.2s ease',
-          display: 'flex',
-          flexDirection: 'column',
+          position: 'fixed', top: 0, left: 0, height: '100%', width: 240, background: '#00304a', color: '#e2e8f0', zIndex: 50,
+          transform: sidebarOpen ? 'translateX(0)' : 'translateX(-100%)', transition: 'transform 0.2s ease',
+          display: 'flex', flexDirection: 'column',
         }}>
           <div style={{ padding: '20px 16px', borderBottom: '1px solid rgba(255,255,255,0.1)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -61,7 +49,11 @@ export default function RootLayout({ children }) {
             <div style={{ padding: '16px 12px 6px', fontSize: 10, letterSpacing: 1, color: '#64748b' }}>SETTINGS</div>
             <Link href="/warehouses" onClick={() => setSidebarOpen(false)}
               style={{ display: 'block', padding: '12px 12px', borderRadius: 6, color: '#e2e8f0', textDecoration: 'none' }}>
-              Warehouses
+              Warehouses / Hubs
+            </Link>
+            <Link href="/stations" onClick={() => setSidebarOpen(false)}
+              style={{ display: 'block', padding: '12px 12px', borderRadius: 6, color: '#e2e8f0', textDecoration: 'none' }}>
+              Stations
             </Link>
           </nav>
           <div style={{ padding: 16, borderTop: '1px solid rgba(255,255,255,0.1)', fontSize: 11, color: '#64748b' }}>
@@ -72,11 +64,7 @@ export default function RootLayout({ children }) {
         <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
           <header style={{ background: '#fff', borderBottom: '1px solid #e5e7eb', padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 12, position: 'sticky', top: 0, zIndex: 30 }}>
             <button onClick={() => setSidebarOpen(true)} style={{ background: 'none', border: 'none', fontSize: 24, cursor: 'pointer', color: '#334155' }}>☰</button>
-            <input
-              type="search"
-              placeholder="Search..."
-              style={{ flex: 1, border: '1px solid #e5e7eb', borderRadius: 6, padding: '8px 12px', fontSize: 14 }}
-            />
+            <input type="search" placeholder="Search..." style={{ flex: 1, border: '1px solid #e5e7eb', borderRadius: 6, padding: '8px 12px', fontSize: 14 }} />
           </header>
           <main style={{ flex: 1, padding: 16 }}>{children}</main>
         </div>
