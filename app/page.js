@@ -4,57 +4,51 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 
 export default function Dashboard() {
-  const [stats, setStats] = useState({ customers: 0, warehouses: 0, shipments: 0 });
+  const [counts, setCounts] = useState({ shipments: 0, customers: 0, warehouses: 0 });
 
   useEffect(() => {
     Promise.all([
+      fetch('/api/shipments').then(r => r.json()),
       fetch('/api/customers').then(r => r.json()),
       fetch('/api/warehouses').then(r => r.json()),
-      fetch('/api/shipments').then(r => r.json()),
-    ]).then(([c, w, s]) => {
-      setStats({ customers: c.length, warehouses: w.length, shipments: s.length });
-    });
+    ]).then(([s, c, w]) => setCounts({ shipments: s.length, customers: c.length, warehouses: w.length }));
   }, []);
+
+  const card = { background: '#fff', border: '1px solid #e5e7eb', borderRadius: 10, padding: 20, flex: 1, minWidth: 180 };
+  const link = { color: '#0074ff', fontSize: 13, textDecoration: 'none', fontWeight: 500 };
 
   return (
     <div>
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-slate-800">Dashboard</h1>
-        <p className="text-slate-500 text-sm mt-1">Railway logistics overview</p>
-      </div>
+      <h1 style={{ fontSize: 26, fontWeight: 700, color: '#0f172a', margin: '0 0 4px' }}>Dashboard</h1>
+      <p style={{ color: '#64748b', fontSize: 14, margin: '0 0 24px' }}>Railway logistics overview</p>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
-        <div className="card p-5">
-          <div className="text-xs font-medium text-slate-500 uppercase tracking-wide">Total Shipments</div>
-          <div className="text-3xl font-bold text-slate-800 mt-2">{stats.shipments}</div>
-          <Link href="/shipments" className="text-xs text-blue-600 mt-3 inline-block">View all →</Link>
+      <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', marginBottom: 28 }}>
+        <div style={card}>
+          <p style={{ margin: 0, fontSize: 13, color: '#64748b' }}>Total Shipments</p>
+          <p style={{ margin: '8px 0', fontSize: 32, fontWeight: 700, color: '#0f172a' }}>{counts.shipments}</p>
+          <Link href="/shipments" style={link}>View all →</Link>
         </div>
-        <div className="card p-5">
-          <div className="text-xs font-medium text-slate-500 uppercase tracking-wide">Customers</div>
-          <div className="text-3xl font-bold text-slate-800 mt-2">{stats.customers}</div>
-          <Link href="/customers" className="text-xs text-blue-600 mt-3 inline-block">Manage →</Link>
+        <div style={card}>
+          <p style={{ margin: 0, fontSize: 13, color: '#64748b' }}>Customers</p>
+          <p style={{ margin: '8px 0', fontSize: 32, fontWeight: 700, color: '#0f172a' }}>{counts.customers}</p>
+          <Link href="/customers" style={link}>Manage →</Link>
         </div>
-        <div className="card p-5">
-          <div className="text-xs font-medium text-slate-500 uppercase tracking-wide">Warehouses</div>
-          <div className="text-3xl font-bold text-slate-800 mt-2">{stats.warehouses}</div>
-          <Link href="/warehouses" className="text-xs text-blue-600 mt-3 inline-block">Manage →</Link>
+        <div style={card}>
+          <p style={{ margin: 0, fontSize: 13, color: '#64748b' }}>Warehouses</p>
+          <p style={{ margin: '8px 0', fontSize: 32, fontWeight: 700, color: '#0f172a' }}>{counts.warehouses}</p>
+          <Link href="/warehouses" style={link}>Manage →</Link>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        <div className="card p-5">
-          <h2 className="font-semibold text-slate-800 mb-4">Quick Actions</h2>
-          <div className="space-y-2">
-            <Link href="/booking" className="block px-4 py-3 bg-blue-50 text-blue-700 rounded-lg text-sm font-medium hover:bg-blue-100">+ New Booking</Link>
-            <Link href="/customers" className="block px-4 py-3 bg-slate-50 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-100">Add Customer</Link>
-            <Link href="/warehouses" className="block px-4 py-3 bg-slate-50 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-100">Add Warehouse</Link>
-          </div>
-        </div>
-        <div className="card p-5">
-          <h2 className="font-semibold text-slate-800 mb-4">Recent Activity</h2>
-          <p className="text-sm text-slate-500">Create a booking to see activity here.</p>
-        </div>
+      <h2 style={{ fontSize: 18, fontWeight: 600, color: '#0f172a', marginBottom: 12 }}>Quick Actions</h2>
+      <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 28 }}>
+        <Link href="/booking" style={{ background: '#0074ff', color: '#fff', padding: '10px 18px', borderRadius: 6, textDecoration: 'none', fontWeight: 600, fontSize: 14 }}>+ New Booking</Link>
+        <Link href="/customers" style={{ background: '#fff', border: '1px solid #e5e7eb', color: '#0f172a', padding: '10px 18px', borderRadius: 6, textDecoration: 'none', fontWeight: 500, fontSize: 14 }}>Add Customer</Link>
+        <Link href="/warehouses" style={{ background: '#fff', border: '1px solid #e5e7eb', color: '#0f172a', padding: '10px 18px', borderRadius: 6, textDecoration: 'none', fontWeight: 500, fontSize: 14 }}>Add Warehouse</Link>
       </div>
+
+      <h2 style={{ fontSize: 18, fontWeight: 600, color: '#0f172a', marginBottom: 8 }}>Recent Activity</h2>
+      <p style={{ color: '#64748b', fontSize: 14 }}>Create a booking to see activity here.</p>
     </div>
   );
 }
