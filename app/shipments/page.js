@@ -22,53 +22,62 @@ export default function ShipmentsPage() {
   const warehouseName = (id) => warehouses.find(w => w.id === id)?.name || '—';
   const warehouse = (id) => warehouses.find(w => w.id === id) || {};
 
+  const th = { textAlign: 'left', padding: '10px 12px', fontSize: 12, color: '#64748b', fontWeight: 600, borderBottom: '1px solid #e5e7eb' };
+  const td = { padding: '10px 12px', fontSize: 13, borderBottom: '1px solid #f1f5f9' };
+
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-slate-800">Shipments</h1>
-      </div>
+      <h1 style={{ fontSize: 24, fontWeight: 700, color: '#0f172a', marginBottom: 16 }}>Shipments</h1>
 
-      <div className="card overflow-x-auto">
-        <table className="w-full text-sm">
+      <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 8, overflow: 'auto' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
-            <tr className="border-b text-left text-slate-500">
-              <th className="py-3 px-3">Master AWB</th>
-              <th className="py-3 px-3">Customer</th>
-              <th className="py-3 px-3">Route</th>
-              <th className="py-3 px-3">Boxes</th>
-              <th className="py-3 px-3">Status</th>
-              <th className="py-3 px-3">Created</th>
+            <tr style={{ background: '#f8fafc' }}>
+              <th style={th}>Master AWB</th>
+              <th style={th}>Customer</th>
+              <th style={th}>Route</th>
+              <th style={th}>Boxes</th>
+              <th style={th}>Status</th>
+              <th style={th}>Created</th>
             </tr>
           </thead>
           <tbody>
             {shipments.map(s => (
-              <tr key={s.id} className="border-b last:border-0 hover:bg-slate-50 cursor-pointer" onClick={() => openDrawer(s)}>
-                <td className="py-3 px-3 font-mono font-medium">{s.masterAWB}</td>
-                <td className="py-3 px-3">{customerName(s.customerId)}</td>
-                <td className="py-3 px-3 text-xs">{warehouseName(s.pickupWarehouseId)} → {warehouseName(s.deliveryWarehouseId)}</td>
-                <td className="py-3 px-3">{s.boxAWBs?.length || 0}</td>
-                <td className="py-3 px-3"><span className="bg-blue-100 text-blue-700 text-xs px-2 py-0.5 rounded-full">BOOKED</span></td>
-                <td className="py-3 px-3 text-slate-500">{new Date(s.createdAt).toLocaleDateString()}</td>
+              <tr key={s.id} onClick={() => openDrawer(s)} style={{ cursor: 'pointer' }}
+                onMouseEnter={e => e.currentTarget.style.background = '#f8fafc'}
+                onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                <td style={{ ...td, fontFamily: 'monospace', fontWeight: 600 }}>{s.masterAWB}</td>
+                <td style={td}>{customerName(s.customerId)}</td>
+                <td style={td}>{warehouseName(s.pickupWarehouseId)} → {warehouseName(s.deliveryWarehouseId)}</td>
+                <td style={td}>{s.boxAWBs?.length || 0}</td>
+                <td style={td}>
+                  <span style={{ background: '#dbeafe', color: '#1d4ed8', fontSize: 11, padding: '2px 8px', borderRadius: 999 }}>BOOKED</span>
+                </td>
+                <td style={{ ...td, color: '#64748b' }}>{s.createdAt ? new Date(s.createdAt).toLocaleDateString() : '—'}</td>
               </tr>
             ))}
           </tbody>
         </table>
-        {shipments.length === 0 && <p className="text-slate-500 text-sm py-6 text-center">No shipments yet.</p>}
+        {shipments.length === 0 && <p style={{ color: '#64748b', fontSize: 13, padding: 24, textAlign: 'center' }}>No shipments yet.</p>}
       </div>
 
       {selected && (
         <>
-          <div className="fixed inset-0 bg-black/40 z-40" onClick={closeDrawer} />
-          <div className="fixed right-0 top-0 h-full w-full max-w-lg bg-white shadow-2xl z-50 flex flex-col">
-            <div className="p-5 border-b flex justify-between items-center shrink-0">
+          <div onClick={closeDrawer} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 40 }} />
+          <div style={{
+            position: 'fixed', top: 0, right: 0, height: '100%', width: '100%', maxWidth: 480,
+            background: '#fff', boxShadow: '-4px 0 24px rgba(0,0,0,0.15)', zIndex: 50,
+            display: 'flex', flexDirection: 'column',
+          }}>
+            <div style={{ padding: 20, borderBottom: '1px solid #e5e7eb', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div>
-                <h2 className="font-bold text-lg font-mono">{selected.masterAWB}</h2>
-                <p className="text-xs text-slate-500">{customerName(selected.customerId)}</p>
+                <h2 style={{ margin: 0, fontSize: 18, fontFamily: 'monospace', fontWeight: 700 }}>{selected.masterAWB}</h2>
+                <p style={{ margin: '4px 0 0', fontSize: 12, color: '#64748b' }}>{customerName(selected.customerId)}</p>
               </div>
-              <button onClick={closeDrawer} className="text-slate-400 hover:text-slate-600 text-2xl leading-none">&times;</button>
+              <button onClick={closeDrawer} style={{ background: 'none', border: 'none', fontSize: 24, color: '#94a3b8', cursor: 'pointer' }}>×</button>
             </div>
 
-            <div className="flex border-b text-sm shrink-0">
+            <div style={{ display: 'flex', borderBottom: '1px solid #e5e7eb', fontSize: 13 }}>
               {[
                 { id: 'parties', label: 'Shipper & Receiver' },
                 { id: 'details', label: 'Shipment Details' },
@@ -77,72 +86,73 @@ export default function ShipmentsPage() {
                 <button
                   key={t.id}
                   onClick={() => setTab(t.id)}
-                  className={`px-4 py-3 font-medium ${tab === t.id ? 'border-b-2 border-blue-600 text-blue-600' : 'text-slate-500 hover:text-slate-700'}`}
+                  style={{
+                    padding: '12px 16px', background: 'none', border: 'none', cursor: 'pointer',
+                    fontWeight: 600, color: tab === t.id ? '#0074ff' : '#64748b',
+                    borderBottom: tab === t.id ? '2px solid #0074ff' : '2px solid transparent',
+                  }}
                 >
                   {t.label}
                 </button>
               ))}
             </div>
 
-            <div className="flex-1 overflow-y-auto p-5 text-sm">
+            <div style={{ flex: 1, overflowY: 'auto', padding: 20, fontSize: 13 }}>
               {tab === 'parties' && (
-                <div className="space-y-6">
-                  <div>
-                    <h3 className="font-semibold text-slate-700 mb-2">Shipper (Consignor)</h3>
-                    <div className="bg-slate-50 p-3 rounded">
-                      <p className="font-medium">{warehouse(selected.pickupWarehouseId).name || '—'}</p>
-                      <p className="text-slate-600 mt-1">{warehouse(selected.pickupWarehouseId).address}</p>
-                      <p className="text-slate-600">{warehouse(selected.pickupWarehouseId).city} {warehouse(selected.pickupWarehouseId).state} - {warehouse(selected.pickupWarehouseId).pin}</p>
-                    </div>
+                <div>
+                  <h3 style={{ fontSize: 14, fontWeight: 600, marginBottom: 8 }}>Shipper (Consignor)</h3>
+                  <div style={{ background: '#f8fafc', padding: 12, borderRadius: 6, marginBottom: 16 }}>
+                    <p style={{ margin: 0, fontWeight: 600 }}>{warehouse(selected.pickupWarehouseId).name || '—'}</p>
+                    <p style={{ margin: '4px 0 0', color: '#475569' }}>{warehouse(selected.pickupWarehouseId).address}</p>
+                    <p style={{ margin: '2px 0 0', color: '#475569' }}>
+                      {[warehouse(selected.pickupWarehouseId).city, warehouse(selected.pickupWarehouseId).state, warehouse(selected.pickupWarehouseId).pin].filter(Boolean).join(', ')}
+                    </p>
                   </div>
-                  <div>
-                    <h3 className="font-semibold text-slate-700 mb-2">Receiver (Consignee)</h3>
-                    <div className="bg-slate-50 p-3 rounded">
-                      <p className="font-medium">{customerName(selected.customerId)}</p>
-                      <p className="text-slate-600 mt-1">{warehouse(selected.deliveryWarehouseId).address}</p>
-                      <p className="text-slate-600">{warehouse(selected.deliveryWarehouseId).city} {warehouse(selected.deliveryWarehouseId).state} - {warehouse(selected.deliveryWarehouseId).pin}</p>
-                    </div>
+                  <h3 style={{ fontSize: 14, fontWeight: 600, marginBottom: 8 }}>Receiver (Consignee)</h3>
+                  <div style={{ background: '#f8fafc', padding: 12, borderRadius: 6 }}>
+                    <p style={{ margin: 0, fontWeight: 600 }}>{warehouse(selected.deliveryWarehouseId).name || '—'}</p>
+                    <p style={{ margin: '4px 0 0', color: '#475569' }}>{warehouse(selected.deliveryWarehouseId).address}</p>
+                    <p style={{ margin: '2px 0 0', color: '#475569' }}>
+                      {[warehouse(selected.deliveryWarehouseId).city, warehouse(selected.deliveryWarehouseId).state, warehouse(selected.deliveryWarehouseId).pin].filter(Boolean).join(', ')}
+                    </p>
                   </div>
                 </div>
               )}
-
               {tab === 'details' && (
-                <div className="space-y-4">
-                  <div>
-                    <h3 className="font-semibold text-slate-700 mb-2">Boxes</h3>
-                    <p>Total boxes: {selected.boxAWBs?.length || 0}</p>
-                    <div className="mt-2 space-y-1 text-xs font-mono">
-                      {(selected.boxAWBs || []).map((awb, i) => (
-                        <div key={i} className="bg-slate-50 px-2 py-1 rounded">Box {i + 1}: {awb}</div>
+                <div>
+                  <p style={{ margin: '0 0 8px' }}><strong>Boxes:</strong> {selected.boxAWBs?.length || 0}</p>
+                  <p style={{ margin: '0 0 8px' }}><strong>Product:</strong> {selected.productDescription || '—'}</p>
+                  <p style={{ margin: '0 0 8px' }}><strong>Remarks:</strong> {selected.remarks || '—'}</p>
+                  {selected.boxes && Array.isArray(selected.boxes) && selected.boxes.length > 0 && (
+                    <div style={{ marginTop: 12 }}>
+                      <strong>Box types</strong>
+                      {selected.boxes.map((b, i) => (
+                        <div key={i} style={{ background: '#f8fafc', padding: 8, borderRadius: 4, marginTop: 6, fontSize: 12 }}>
+                          Count: {b.count} • Weight: {b.weight || '—'} kg • {b.length || '—'}×{b.width || '—'}×{b.height || '—'} cm
+                        </div>
                       ))}
                     </div>
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-slate-700 mb-2">Product</h3>
-                    <p>{selected.productDescription || '—'}</p>
-                    {selected.remarks && <p className="mt-1 text-slate-500">Remarks: {selected.remarks}</p>}
-                  </div>
+                  )}
                 </div>
               )}
-
               {tab === 'invoice' && (
-                <div className="space-y-4">
-                  <div className="bg-slate-50 p-3 rounded">
-                    <p><span className="text-slate-500">Invoice No:</span> {selected.invoiceNumber || '—'}</p>
-                    <p className="mt-1"><span className="text-slate-500">Amount:</span> ₹{selected.invoiceAmount || 0}</p>
-                    <p className="mt-1"><span className="text-slate-500">Insurance:</span> {selected.insurance ? 'Yes' : 'No'}</p>
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-slate-700 mb-2">E-way Bill</h3>
-                    <p className="text-slate-500 text-xs">Not uploaded yet</p>
-                  </div>
-                  <div className="pt-2">
-                    <a href={`/api/labels/${selected.id}`} className="btn-success inline-block" download>
-                      Download Shipping Labels
-                    </a>
-                  </div>
+                <div>
+                  <p style={{ margin: '0 0 8px' }}><strong>Invoice No:</strong> {selected.invoiceNumber || '—'}</p>
+                  <p style={{ margin: '0 0 8px' }}><strong>Amount:</strong> ₹{selected.invoiceAmount || 0}</p>
+                  <p style={{ margin: '0 0 16px' }}><strong>Insurance:</strong> {selected.insurance ? 'Yes' : 'No'}</p>
+                  <h3 style={{ fontSize: 14, fontWeight: 600, marginBottom: 8 }}>E-way Bill</h3>
+                  <p style={{ color: '#64748b' }}>Not uploaded yet</p>
                 </div>
               )}
+            </div>
+
+            <div style={{ padding: 16, borderTop: '1px solid #e5e7eb' }}>
+              <a href={`/api/labels/${selected.id}`} download style={{
+                display: 'block', textAlign: 'center', background: '#059669', color: '#fff',
+                padding: '10px 16px', borderRadius: 6, textDecoration: 'none', fontWeight: 600, fontSize: 14,
+              }}>
+                Download Shipping Labels
+              </a>
             </div>
           </div>
         </>
