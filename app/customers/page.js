@@ -23,20 +23,30 @@ export default function CustomersPage() {
   };
 
   return (
-    <div>
-      <h2 className="text-2xl font-bold mb-4">Customers</h2>
-      <form onSubmit={handleSubmit} className="mb-6 space-y-2 max-w-md">
-        <input className="border p-2 w-full" placeholder="Name" value={form.name} onChange={e => setForm({...form, name: e.target.value})} required />
-        <input className="border p-2 w-full" placeholder="Email" value={form.email} onChange={e => setForm({...form, email: e.target.value})} />
-        <input className="border p-2 w-full" placeholder="Phone" value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} />
-        <textarea className="border p-2 w-full" placeholder="Address" value={form.address} onChange={e => setForm({...form, address: e.target.value})} />
-        <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">Add Customer</button>
-      </form>
-      <ul className="space-y-2">
+    <div className="max-w-3xl">
+      <h2 className="text-2xl font-bold text-slate-800 mb-6">Customers</h2>
+      <div className="card mb-6">
+        <form onSubmit={handleSubmit} className="space-y-3">
+          <input className="input" placeholder="Full name" value={form.name} onChange={e => setForm({...form, name: e.target.value})} required />
+          <div className="grid grid-cols-2 gap-3">
+            <input className="input" placeholder="Email" value={form.email} onChange={e => setForm({...form, email: e.target.value})} />
+            <input className="input" placeholder="Phone" value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} />
+          </div>
+          <textarea className="input" placeholder="Address" rows={2} value={form.address} onChange={e => setForm({...form, address: e.target.value})} />
+          <button type="submit" className="btn-primary">Add Customer</button>
+        </form>
+      </div>
+      <div className="space-y-2">
         {customers.map(c => (
-          <li key={c.id} className="border p-2">{c.name} - {c.email} - {c.phone}</li>
+          <div key={c.id} className="card py-3 flex justify-between items-center">
+            <div>
+              <div className="font-medium">{c.name}</div>
+              <div className="text-sm text-slate-500">{c.email} · {c.phone}</div>
+            </div>
+          </div>
         ))}
-      </ul>
+        {customers.length === 0 && <p className="text-slate-500 text-sm">No customers yet.</p>}
+      </div>
     </div>
   );
 }

@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react';
 
+const steps = ['Customer', 'Pickup', 'Delivery', 'Details'];
+
 export default function BookingPage() {
   const [step, setStep] = useState(1);
   const [customers, setCustomers] = useState([]);
@@ -25,13 +27,13 @@ export default function BookingPage() {
     fetch('/api/warehouses').then(r => r.json()).then(setWarehouses);
   }, []);
 
-  const filteredPickup = warehouses.filter(w => 
-    w.name.toLowerCase().includes(searchPickup.toLowerCase()) ||
-    w.city.toLowerCase().includes(searchPickup.toLowerCase())
+  const filteredPickup = warehouses.filter(w =>
+    (w.name || '').toLowerCase().includes(searchPickup.toLowerCase()) ||
+    (w.city || '').toLowerCase().includes(searchPickup.toLowerCase())
   );
-  const filteredDelivery = warehouses.filter(w => 
-    w.name.toLowerCase().includes(searchDelivery.toLowerCase()) ||
-    w.city.toLowerCase().includes(searchDelivery.toLowerCase())
+  const filteredDelivery = warehouses.filter(w =>
+    (w.name || '').toLowerCase().includes(searchDelivery.toLowerCase()) ||
+    (w.city || '').toLowerCase().includes(searchDelivery.toLowerCase())
   );
 
   const addBoxType = () => {
@@ -52,111 +54,141 @@ export default function BookingPage() {
     });
     const shipment = await res.json();
     setSubmitted(shipment);
-    setStep(5);
   };
 
   if (submitted) {
     return (
-      <div>
-        <h2 className="text-2xl font-bold mb-4">Booking Confirmed!</h2>
-        <p>Master AWB: <strong>{submitted.masterAWB}</strong></p>
-        <p>Box AWBs: {submitted.boxAWBs.join(', ')}</p>
-        <a href={`/api/labels/${submitted.id}`} className="mt-4 inline-block bg-green-600 text-white px-4 py-2 rounded" download>
-          Generate & Download Labels
+      <div className="max-w-xl mx-auto card text-center">
+        <div className="text-5xl mb-4">✅</div>
+        <h2 className="text-2xl font-bold text-slate-800 mb-2">Booking Confirmed</h2>
+        <p className="text-slate-600 mb-4">Master AWB</p>
+        <p className="text-3xl font-mono font-bold text-blue-600 mb-6">{submitted.masterAWB}</p>
+        <p className="text-sm text-slate-500 mb-6">Box AWBs: {submitted.boxAWBs.join(', ')}</p>
+        <a href={`/api/labels/${submitted.id}`} className="btn-success inline-block" download>
+          Download Shipping Labels
         </a>
       </div>
     );
   }
 
   return (
-    <div className="max-w-2xl">
-      <h2 className="text-2xl font-bold mb-6">New Booking</h2>
-      <div className="mb-4">Step {step} of 4</div>
+    <div className="max-w-2xl mx-auto">
+      <h2 className="text-2xl font-bold text-slate-800 mb-6">New Booking</h2>
 
-      {step === 1 && (
-        <div>
-          <h3 className="font-semibold mb-2">Select Customer</h3>
-          <select className="border p-2 w-full" value={form.customerId} onChange={e => setForm({...form, customerId: e.target.value})}>
-            <option value="">-- Select Customer --</option>
-            {customers.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-          </select>
-          <button onClick={() => setStep(2)} disabled={!form.customerId} className="mt-4 bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-50">Next</button>
-        </div>
-      )}
-
-      {step === 2 && (
-        <div>
-          <h3 className="font-semibold mb-2">Pickup Warehouse</h3>
-          <input className="border p-2 w-full mb-2" placeholder="Search warehouse..." value={searchPickup} onChange={e => setSearchPickup(e.target.value)} />
-          <div className="max-h-40 overflow-y-auto border">
-            {filteredPickup.map(w => (
-              <div key={w.id} className={`p-2 cursor-pointer ${form.pickupWarehouseId === w.id ? 'bg-blue-100' : ''}`} onClick={() => setForm({...form, pickupWarehouseId: w.id})}>
-                {w.name} - {w.city}
-              </div>
-            ))}
-          </div>
-          <button onClick={() => setStep(3)} disabled={!form.pickupWarehouseId} className="mt-4 bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-50">Next</button>
-        </div>
-      )}
-
-      {step === 3 && (
-        <div>
-          <h3 className="font-semibold mb-2">Delivery Warehouse</h3>
-          <input className="border p-2 w-full mb-2" placeholder="Search warehouse..." value={searchDelivery} onChange={e => setSearchDelivery(e.target.value)} />
-          <div className="max-h-40 overflow-y-auto border">
-            {filteredDelivery.map(w => (
-              <div key={w.id} className={`p-2 cursor-pointer ${form.deliveryWarehouseId === w.id ? 'bg-blue-100' : ''}`} onClick={() => setForm({...form, deliveryWarehouseId: w.id})}>
-                {w.name} - {w.city}
-              </div>
-            ))}
-          </div>
-          <button onClick={() => setStep(4)} disabled={!form.deliveryWarehouseId} className="mt-4 bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-50">Next</button>
-        </div>
-      )}
-
-      {step === 4 && (
-        <div className="space-y-4">
-          <h3 className="font-semibold">Shipment Details</h3>
-          {form.boxes.map((box, i) => (
-            <div key={i} className="border p-3 space-y-2">
-              <p>Box Type {i+1}</p>
-              <input type="number" className="border p-1" placeholder="Count" value={box.count} onChange={e => updateBox(i, 'count', e.target.value)} />
-              <input className="border p-1" placeholder="Weight (kg)" value={box.weight} onChange={e => updateBox(i, 'weight', e.target.value)} />
-              <div className="flex gap-2">
-                <input className="border p-1 w-20" placeholder="L cm" value={box.length} onChange={e => updateBox(i, 'length', e.target.value)} />
-                <input className="border p-1 w-20" placeholder="W cm" value={box.width} onChange={e => updateBox(i, 'width', e.target.value)} />
-                <input className="border p-1 w-20" placeholder="H cm" value={box.height} onChange={e => updateBox(i, 'height', e.target.value)} />
-              </div>
+      <div className="flex items-center justify-between mb-8">
+        {steps.map((label, i) => (
+          <div key={i} className="flex-1 flex items-center">
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
+              step > i + 1 ? 'bg-emerald-500 text-white' : step === i + 1 ? 'bg-blue-600 text-white' : 'bg-slate-200 text-slate-500'
+            }`}>
+              {step > i + 1 ? '✓' : i + 1}
             </div>
-          ))}
-          <button type="button" onClick={addBoxType} className="text-blue-600">+ Add another type of box</button>
-
-          <div>
-            <h3 className="font-semibold mt-4">Invoice Details</h3>
-            <input className="border p-2 w-full" placeholder="Invoice Number" value={form.invoiceNumber} onChange={e => setForm({...form, invoiceNumber: e.target.value})} />
-            <input className="border p-2 w-full mt-2" placeholder="Invoice Amount" value={form.invoiceAmount} onChange={e => setForm({...form, invoiceAmount: e.target.value})} />
-            <label className="flex items-center mt-2">
-              <input type="checkbox" checked={form.insurance} onChange={e => setForm({...form, insurance: e.target.checked})} />
-              <span className="ml-2">Insurance (Yes/No)</span>
-            </label>
+            <span className={`ml-2 text-sm hidden sm:block ${step === i + 1 ? 'font-medium text-blue-600' : 'text-slate-500'}`}>{label}</span>
+            {i < steps.length - 1 && <div className={`flex-1 h-0.5 mx-2 ${step > i + 1 ? 'bg-emerald-500' : 'bg-slate-200'}`} />}
           </div>
+        ))}
+      </div>
 
-          <div>
-            <h3 className="font-semibold">Product Description</h3>
-            <textarea className="border p-2 w-full" value={form.productDescription} onChange={e => setForm({...form, productDescription: e.target.value})} />
+      <div className="card">
+        {step === 1 && (
+          <div className="space-y-4">
+            <h3 className="font-semibold text-lg">Select Customer</h3>
+            <select className="input" value={form.customerId} onChange={e => setForm({...form, customerId: e.target.value})}>
+              <option value="">-- Choose customer --</option>
+              {customers.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+            </select>
+            <button onClick={() => setStep(2)} disabled={!form.customerId} className="btn-primary">Continue</button>
           </div>
+        )}
 
-          <div className="mt-6">
-            <h3 className="font-semibold">Confirmation</h3>
-            <p>Customer: {customers.find(c => c.id === form.customerId)?.name}</p>
-            <p>Pickup: {warehouses.find(w => w.id === form.pickupWarehouseId)?.name}</p>
-            <p>Delivery: {warehouses.find(w => w.id === form.deliveryWarehouseId)?.name}</p>
-            <p>Total boxes: {form.boxes.reduce((s, b) => s + Number(b.count || 0), 0)}</p>
+        {step === 2 && (
+          <div className="space-y-4">
+            <h3 className="font-semibold text-lg">Pickup Warehouse</h3>
+            <input className="input" placeholder="Search by name or city..." value={searchPickup} onChange={e => setSearchPickup(e.target.value)} />
+            <div className="max-h-48 overflow-y-auto border rounded-lg divide-y">
+              {filteredPickup.length === 0 && <div className="p-3 text-slate-500 text-sm">No matching warehouses</div>}
+              {filteredPickup.map(w => (
+                <div key={w.id} className={`p-3 cursor-pointer hover:bg-slate-50 ${form.pickupWarehouseId === w.id ? 'bg-blue-50 border-l-4 border-blue-500' : ''}`} onClick={() => setForm({...form, pickupWarehouseId: w.id})}>
+                  <div className="font-medium">{w.name}</div>
+                  <div className="text-sm text-slate-500">{w.city} {w.pin}</div>
+                </div>
+              ))}
+            </div>
+            <div className="flex gap-3">
+              <button onClick={() => setStep(1)} className="px-4 py-2 border rounded-lg">Back</button>
+              <button onClick={() => setStep(3)} disabled={!form.pickupWarehouseId} className="btn-primary">Continue</button>
+            </div>
           </div>
+        )}
 
-          <button onClick={handleSubmit} className="mt-4 bg-green-600 text-white px-6 py-2 rounded">Submit Booking & Generate MAWB</button>
-        </div>
-      )}
+        {step === 3 && (
+          <div className="space-y-4">
+            <h3 className="font-semibold text-lg">Delivery Warehouse</h3>
+            <input className="input" placeholder="Search by name or city..." value={searchDelivery} onChange={e => setSearchDelivery(e.target.value)} />
+            <div className="max-h-48 overflow-y-auto border rounded-lg divide-y">
+              {filteredDelivery.length === 0 && <div className="p-3 text-slate-500 text-sm">No matching warehouses</div>}
+              {filteredDelivery.map(w => (
+                <div key={w.id} className={`p-3 cursor-pointer hover:bg-slate-50 ${form.deliveryWarehouseId === w.id ? 'bg-blue-50 border-l-4 border-blue-500' : ''}`} onClick={() => setForm({...form, deliveryWarehouseId: w.id})}>
+                  <div className="font-medium">{w.name}</div>
+                  <div className="text-sm text-slate-500">{w.city} {w.pin}</div>
+                </div>
+              ))}
+            </div>
+            <div className="flex gap-3">
+              <button onClick={() => setStep(2)} className="px-4 py-2 border rounded-lg">Back</button>
+              <button onClick={() => setStep(4)} disabled={!form.deliveryWarehouseId} className="btn-primary">Continue</button>
+            </div>
+          </div>
+        )}
+
+        {step === 4 && (
+          <div className="space-y-6">
+            <h3 className="font-semibold text-lg">Shipment Details</h3>
+            {form.boxes.map((box, i) => (
+              <div key={i} className="border rounded-lg p-4 space-y-3 bg-slate-50">
+                <p className="font-medium text-sm">Box Type {i + 1}</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <input type="number" className="input" placeholder="Count" value={box.count} onChange={e => updateBox(i, 'count', e.target.value)} />
+                  <input className="input" placeholder="Weight (kg)" value={box.weight} onChange={e => updateBox(i, 'weight', e.target.value)} />
+                </div>
+                <div className="grid grid-cols-3 gap-3">
+                  <input className="input" placeholder="L (cm)" value={box.length} onChange={e => updateBox(i, 'length', e.target.value)} />
+                  <input className="input" placeholder="W (cm)" value={box.width} onChange={e => updateBox(i, 'width', e.target.value)} />
+                  <input className="input" placeholder="H (cm)" value={box.height} onChange={e => updateBox(i, 'height', e.target.value)} />
+                </div>
+              </div>
+            ))}
+            <button type="button" onClick={addBoxType} className="text-blue-600 text-sm font-medium">+ Add another box type</button>
+
+            <div className="space-y-3">
+              <h4 className="font-medium">Invoice</h4>
+              <input className="input" placeholder="Invoice Number" value={form.invoiceNumber} onChange={e => setForm({...form, invoiceNumber: e.target.value})} />
+              <input className="input" placeholder="Invoice Amount" value={form.invoiceAmount} onChange={e => setForm({...form, invoiceAmount: e.target.value})} />
+              <label className="flex items-center gap-2 text-sm">
+                <input type="checkbox" className="rounded" checked={form.insurance} onChange={e => setForm({...form, insurance: e.target.checked})} />
+                Insurance required
+              </label>
+            </div>
+
+            <div>
+              <h4 className="font-medium mb-2">Product Description</h4>
+              <textarea className="input h-20" value={form.productDescription} onChange={e => setForm({...form, productDescription: e.target.value})} placeholder="Describe the goods" />
+            </div>
+
+            <div className="bg-slate-100 rounded-lg p-4 text-sm space-y-1">
+              <p><strong>Customer:</strong> {customers.find(c => c.id === form.customerId)?.name || '—'}</p>
+              <p><strong>Pickup:</strong> {warehouses.find(w => w.id === form.pickupWarehouseId)?.name || '—'}</p>
+              <p><strong>Delivery:</strong> {warehouses.find(w => w.id === form.deliveryWarehouseId)?.name || '—'}</p>
+              <p><strong>Total boxes:</strong> {form.boxes.reduce((s, b) => s + Number(b.count || 0), 0)}</p>
+            </div>
+
+            <div className="flex gap-3">
+              <button onClick={() => setStep(3)} className="px-4 py-2 border rounded-lg">Back</button>
+              <button onClick={handleSubmit} className="btn-success flex-1">Submit & Generate MAWB</button>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

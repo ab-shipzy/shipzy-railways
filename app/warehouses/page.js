@@ -23,22 +23,30 @@ export default function WarehousesPage() {
   };
 
   return (
-    <div>
-      <h2 className="text-2xl font-bold mb-4">Warehouses</h2>
-      <form onSubmit={handleSubmit} className="mb-6 space-y-2 max-w-md">
-        <input className="border p-2 w-full" placeholder="Name" value={form.name} onChange={e => setForm({...form, name: e.target.value})} required />
-        <textarea className="border p-2 w-full" placeholder="Address" value={form.address} onChange={e => setForm({...form, address: e.target.value})} />
-        <input className="border p-2 w-full" placeholder="City" value={form.city} onChange={e => setForm({...form, city: e.target.value})} />
-        <input className="border p-2 w-full" placeholder="State" value={form.state} onChange={e => setForm({...form, state: e.target.value})} />
-        <input className="border p-2 w-full" placeholder="PIN" value={form.pin} onChange={e => setForm({...form, pin: e.target.value})} />
-        <input className="border p-2 w-full" placeholder="Contact" value={form.contact} onChange={e => setForm({...form, contact: e.target.value})} />
-        <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">Add Warehouse</button>
-      </form>
-      <ul className="space-y-2">
+    <div className="max-w-3xl">
+      <h2 className="text-2xl font-bold text-slate-800 mb-6">Warehouses</h2>
+      <div className="card mb-6">
+        <form onSubmit={handleSubmit} className="space-y-3">
+          <input className="input" placeholder="Warehouse name" value={form.name} onChange={e => setForm({...form, name: e.target.value})} required />
+          <textarea className="input" placeholder="Full address" rows={2} value={form.address} onChange={e => setForm({...form, address: e.target.value})} />
+          <div className="grid grid-cols-3 gap-3">
+            <input className="input" placeholder="City" value={form.city} onChange={e => setForm({...form, city: e.target.value})} />
+            <input className="input" placeholder="State" value={form.state} onChange={e => setForm({...form, state: e.target.value})} />
+            <input className="input" placeholder="PIN" value={form.pin} onChange={e => setForm({...form, pin: e.target.value})} />
+          </div>
+          <input className="input" placeholder="Contact" value={form.contact} onChange={e => setForm({...form, contact: e.target.value})} />
+          <button type="submit" className="btn-primary">Add Warehouse</button>
+        </form>
+      </div>
+      <div className="space-y-2">
         {warehouses.map(w => (
-          <li key={w.id} className="border p-2">{w.name} - {w.city} {w.pin}</li>
+          <div key={w.id} className="card py-3">
+            <div className="font-medium">{w.name}</div>
+            <div className="text-sm text-slate-500">{w.city}, {w.state} {w.pin}</div>
+          </div>
         ))}
-      </ul>
+        {warehouses.length === 0 && <p className="text-slate-500 text-sm">No warehouses yet.</p>}
+      </div>
     </div>
   );
 }
