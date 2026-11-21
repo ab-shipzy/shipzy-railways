@@ -18,13 +18,13 @@ export default function CustomersPage() {
       body: JSON.stringify(form),
     });
     const newC = await res.json();
-    setCustomers([...customers, newC]);
+    setCustomers([newC, ...customers]);
     setForm({ name: '', email: '', phone: '', address: '' });
   };
 
   return (
-    <div className="max-w-3xl">
-      <h2 className="text-2xl font-bold text-slate-800 mb-6">Customers</h2>
+    <div>
+      <h1 className="text-2xl font-bold text-slate-800 mb-6">Customers</h1>
       <div className="card mb-6">
         <form onSubmit={handleSubmit} className="space-y-3">
           <input className="input" placeholder="Full name" value={form.name} onChange={e => setForm({...form, name: e.target.value})} required />
@@ -36,16 +36,29 @@ export default function CustomersPage() {
           <button type="submit" className="btn-primary">Add Customer</button>
         </form>
       </div>
-      <div className="space-y-2">
-        {customers.map(c => (
-          <div key={c.id} className="card py-3 flex justify-between items-center">
-            <div>
-              <div className="font-medium">{c.name}</div>
-              <div className="text-sm text-slate-500">{c.email} · {c.phone}</div>
-            </div>
-          </div>
-        ))}
-        {customers.length === 0 && <p className="text-slate-500 text-sm">No customers yet.</p>}
+
+      <div className="card overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-b text-left text-slate-500">
+              <th className="py-3 px-3">Name</th>
+              <th className="py-3 px-3">Email</th>
+              <th className="py-3 px-3">Phone</th>
+              <th className="py-3 px-3">Address</th>
+            </tr>
+          </thead>
+          <tbody>
+            {customers.map(c => (
+              <tr key={c.id} className="border-b last:border-0 hover:bg-slate-50">
+                <td className="py-3 px-3 font-medium">{c.name}</td>
+                <td className="py-3 px-3">{c.email || '—'}</td>
+                <td className="py-3 px-3">{c.phone || '—'}</td>
+                <td className="py-3 px-3 text-slate-600 max-w-xs truncate">{c.address || '—'}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        {customers.length === 0 && <p className="text-slate-500 text-sm py-6 text-center">No customers yet.</p>}
       </div>
     </div>
   );

@@ -18,13 +18,13 @@ export default function WarehousesPage() {
       body: JSON.stringify(form),
     });
     const newW = await res.json();
-    setWarehouses([...warehouses, newW]);
+    setWarehouses([newW, ...warehouses]);
     setForm({ name: '', address: '', city: '', state: '', pin: '', contact: '' });
   };
 
   return (
-    <div className="max-w-3xl">
-      <h2 className="text-2xl font-bold text-slate-800 mb-6">Warehouses</h2>
+    <div>
+      <h1 className="text-2xl font-bold text-slate-800 mb-6">Warehouses</h1>
       <div className="card mb-6">
         <form onSubmit={handleSubmit} className="space-y-3">
           <input className="input" placeholder="Warehouse name" value={form.name} onChange={e => setForm({...form, name: e.target.value})} required />
@@ -38,14 +38,31 @@ export default function WarehousesPage() {
           <button type="submit" className="btn-primary">Add Warehouse</button>
         </form>
       </div>
-      <div className="space-y-2">
-        {warehouses.map(w => (
-          <div key={w.id} className="card py-3">
-            <div className="font-medium">{w.name}</div>
-            <div className="text-sm text-slate-500">{w.city}, {w.state} {w.pin}</div>
-          </div>
-        ))}
-        {warehouses.length === 0 && <p className="text-slate-500 text-sm">No warehouses yet.</p>}
+
+      <div className="card overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-b text-left text-slate-500">
+              <th className="py-3 px-3">Name</th>
+              <th className="py-3 px-3">City</th>
+              <th className="py-3 px-3">State</th>
+              <th className="py-3 px-3">PIN</th>
+              <th className="py-3 px-3">Contact</th>
+            </tr>
+          </thead>
+          <tbody>
+            {warehouses.map(w => (
+              <tr key={w.id} className="border-b last:border-0 hover:bg-slate-50">
+                <td className="py-3 px-3 font-medium">{w.name}</td>
+                <td className="py-3 px-3">{w.city || '—'}</td>
+                <td className="py-3 px-3">{w.state || '—'}</td>
+                <td className="py-3 px-3">{w.pin || '—'}</td>
+                <td className="py-3 px-3">{w.contact || '—'}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        {warehouses.length === 0 && <p className="text-slate-500 text-sm py-6 text-center">No warehouses yet.</p>}
       </div>
     </div>
   );

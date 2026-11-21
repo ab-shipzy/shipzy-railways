@@ -7,6 +7,7 @@ export default function ShipmentsPage() {
   const [customers, setCustomers] = useState([]);
   const [warehouses, setWarehouses] = useState([]);
   const [selected, setSelected] = useState(null);
+  const [tab, setTab] = useState('parties');
 
   useEffect(() => {
     fetch('/api/shipments').then(r => r.json()).then(setShipments);
@@ -14,11 +15,12 @@ export default function ShipmentsPage() {
     fetch('/api/warehouses').then(r => r.json()).then(setWarehouses);
   }, []);
 
-  const openDrawer = (s) => setSelected(s);
+  const openDrawer = (s) => { setSelected(s); setTab('parties'); };
   const closeDrawer = () => setSelected(null);
 
   const customerName = (id) => customers.find(c => c.id === id)?.name || '—';
   const warehouseName = (id) => warehouses.find(w => w.id === id)?.name || '—';
+  const warehouse = (id) => warehouses.find(w => w.id === id) || {};
 
   return (
     <div>
@@ -57,39 +59,90 @@ export default function ShipmentsPage() {
       {selected && (
         <>
           <div className="fixed inset-0 bg-black/40 z-40" onClick={closeDrawer} />
-          <div className="fixed right-0 top-0 h-full w-full max-w-md bg-white shadow-2xl z-50 overflow-y-auto">
-            <div className="p-6 border-b flex justify-between items-center">
-              <h2 className="font-bold text-lg font-mono">{selected.masterAWB}</h2>
+          <div className="fixed right-0 top-0 h-full w-full max-w-lg bg-white shadow-2xl z-50 flex flex-col">
+            <div className="p-5 border-b flex justify-between items-center shrink-0">
+              <div>
+                <h2 className="font-bold text-lg font-mono">{selected.masterAWB}</h2>
+                <p className="text-xs text-slate-500">{customerName(selected.customerId)}</p>
+              </div>
               <button onClick={closeDrawer} className="text-slate-400 hover:text-slate-600 text-2xl leading-none">&times;</button>
             </div>
-            <div className="p-6 space-y-6 text-sm">
-              <div>
-                <h3 className="font-semibold text-slate-700 mb-2">Booking Information</h3>
-                <p>Customer: {customerName(selected.customerId)}</p>
-                <p>Invoice: {selected.invoiceNumber || '—'} · ₹{selected.invoiceAmount || 0}</p>
-                <p>Insurance: {selected.insurance ? 'Yes' : 'No'}</p>
-              </div>
-              <div>
-                <h3 className="font-semibold text-slate-700 mb-2">Route — From / To</h3>
-                <p>From: {warehouseName(selected.pickupWarehouseId)}</p>
-                <p>To: {warehouseName(selected.deliveryWarehouseId)}</p>
-              </div>
-              <div>
-                <h3 className="font-semibold text-slate-700 mb-2">Boxes</h3>
-                <p>Total: {selected.boxAWBs?.length || 0}</p>
-                <p className="text-xs text-slate-500 mt-1">AWBs: {selected.boxAWBs?.join(', ')}</p>
-              </div>
-              <div>
-                <h3 className="font-semibold text-slate-700 mb-2">Product</h3>
-                <p>{selected.productDescription || '—'}</p>
-                {selected.remarks && <p className="mt-1 text-slate-500">Remarks: {selected.remarks}</p>}
-              </div>
-              <div>
-                <h3 className="font-semibold text-slate-700 mb-2">Documents</h3>
-                <a href={`/api/labels/${selected.id}`} className="btn-success inline-block" download>
-                  Download Shipping Labels
-                </a>
-              </div>
+
+            <div className="flex border-b text-sm shrink-0">
+              {[
+                { id: 'parties', label: 'Shipper & Receiver' },
+                { id: 'details', label: 'Shipment Details' },
+                { id: 'invoice', label: 'Invoice & E-way' },
+              ].map(t => (
+                <button
+                  key={t.id}
+                  onClick={() => setTab(t.id)}
+                  className={`px-4 py-3 font-medium ${tab === t.id ? 'border-b-2 border-blue-600 text-blue-600' : 'text-slate-500 hover:text-slate-700'}`}
+                >
+                  {t.label}
+                </button>
+              ))}
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-5 text-sm">
+              {tab === 'parties' && (
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="font-semibold text-slate-700 mb-2">Shipper (Consignor)</h3>
+                    <div className="bg-slate-50 p-3 rounded">
+                      <p className="font-medium">{warehouse(selected.pickupWarehouseId).name || '—'}</p>
+                      <p className="text-slate-600 mt-1">{warehouse(selected.pickupWarehouseId).address}</p>
+                      <p className="text-slate-600">{warehouse(selected.pickupWarehouseId).city} {warehouse(selected.pickupWarehouseId).state} - {warehouse(selected.pickupWarehouseId).pin}</p>
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-slate-700 mb-2">Receiver (Consignee)</h3>
+                    <div className="bg-slate-50 p-3 rounded">
+                      <p className="font-medium">{customerName(selected.customerId)}</p>
+                      <p className="text-slate-600 mt-1">{warehouse(selected.deliveryWarehouseId).address}</p>
+                      <p className="text-slate-600">{warehouse(selected.deliveryWarehouseId).city} {warehouse(selected.deliveryWarehouseId).state} - {warehouse(selected.deliveryWarehouseId).pin}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {tab === 'details' && (
+                <div className="space-y-4">
+                  <div>
+                    <h3 className="font-semibold text-slate-700 mb-2">Boxes</h3>
+                    <p>Total boxes: {selected.boxAWBs?.length || 0}</p>
+                    <div className="mt-2 space-y-1 text-xs font-mono">
+                      {(selected.boxAWBs || []).map((awb, i) => (
+                        <div key={i} className="bg-slate-50 px-2 py-1 rounded">Box {i + 1}: {awb}</div>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-slate-700 mb-2">Product</h3>
+                    <p>{selected.productDescription || '—'}</p>
+                    {selected.remarks && <p className="mt-1 text-slate-500">Remarks: {selected.remarks}</p>}
+                  </div>
+                </div>
+              )}
+
+              {tab === 'invoice' && (
+                <div className="space-y-4">
+                  <div className="bg-slate-50 p-3 rounded">
+                    <p><span className="text-slate-500">Invoice No:</span> {selected.invoiceNumber || '—'}</p>
+                    <p className="mt-1"><span className="text-slate-500">Amount:</span> ₹{selected.invoiceAmount || 0}</p>
+                    <p className="mt-1"><span className="text-slate-500">Insurance:</span> {selected.insurance ? 'Yes' : 'No'}</p>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-slate-700 mb-2">E-way Bill</h3>
+                    <p className="text-slate-500 text-xs">Not uploaded yet</p>
+                  </div>
+                  <div className="pt-2">
+                    <a href={`/api/labels/${selected.id}`} className="btn-success inline-block" download>
+                      Download Shipping Labels
+                    </a>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </>
