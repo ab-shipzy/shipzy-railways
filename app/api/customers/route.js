@@ -1,24 +1,12 @@
-import { NextResponse } from 'next/server';
-import { loadData, saveData } from '@/lib/storage';
-import { v4 as uuidv4 } from 'uuid';
+import { getCustomers, addCustomer } from '../../../lib/db';
 
 export async function GET() {
-  const data = loadData();
-  return NextResponse.json(data.customers);
+  const customers = await getCustomers();
+  return Response.json(customers);
 }
 
-export async function POST(request) {
-  const body = await request.json();
-  const data = loadData();
-  const customer = {
-    id: uuidv4(),
-    name: body.name || '',
-    email: body.email || '',
-    phone: body.phone || '',
-    address: body.address || '',
-    createdAt: new Date().toISOString(),
-  };
-  data.customers.push(customer);
-  saveData(data);
-  return NextResponse.json(customer);
+export async function POST(req) {
+  const body = await req.json();
+  const customer = await addCustomer(body);
+  return Response.json(customer);
 }

@@ -1,38 +1,24 @@
-import { NextResponse } from 'next/server';
-import { loadData, saveData, getNextMasterAWB, generateBoxAWBs } from '@/lib/storage';
-import { v4 as uuidv4 } from 'uuid';
+import { getShipments, addShipment, nextAWB } from '../../../lib/db';
 
 export async function GET() {
-  const data = loadData();
-  return NextResponse.json(data.shipments);
+  const shipments = await getShipments();
+  return Response.json(shipments);
 }
 
-export async function POST(request) {
-  const body = await request.json();
-  const data = loadData();
-
-  const masterAWB = getNextMasterAWB();
-  const totalBoxes = body.boxes.reduce((sum, b) => sum + (Number(b.count) || 0), 0);
-  const boxAWBs = generateBoxAWBs(masterAWB, totalBoxes);
-
-  const shipment = {
-    id: uuidv4(),
-    masterAWB,
+export async function POST(req) {
+  const body = await req.json();
+  const master = await nextAWB();
+  const totalBoxes = (body.boxes || []).reduce((s, b) => s + Number(b.count || 1), 0) || 1;
+  const boxAWBs = [];
+  let current = parseInt(master, 10);
+  for (let i = 0; i < totalBoxes; i++) {
+    boxAWBs.push(String(current).padStart(8, '0'));
+    current += 11;
+  }
+  const shipment = await addShipment({
+    ...body,
+    masterAWB: master,
     boxAWBs,
-    customerId: body.customerId,
-    pickupWarehouseId: body.pickupWarehouseId,
-    deliveryWarehouseId: body.deliveryWarehouseId,
-    boxes: body.boxes || [],
-    invoiceNumber: body.invoiceNumber || '',
-    invoiceAmount: body.invoiceAmount || 0,
-    insurance: !!body.insurance,
-    productDescription: body.productDescription || '',
-    status: 'booked',
-    createdAt: new Date().toISOString(),
-  };
-
-  data.shipments.push(shipment);
-  saveData(data);
-
-  return NextResponse.json(shipment);
+  });
+  return Response.json(shipment);
 }
