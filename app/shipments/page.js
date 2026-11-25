@@ -8,151 +8,155 @@ export default function ShipmentsPage() {
   const [warehouses, setWarehouses] = useState([]);
   const [selected, setSelected] = useState(null);
   const [tab, setTab] = useState('parties');
+  const [edit, setEdit] = useState({});
 
-  useEffect(() => {
+  const load = () => {
     fetch('/api/shipments').then(r => r.json()).then(setShipments);
     fetch('/api/customers').then(r => r.json()).then(setCustomers);
     fetch('/api/warehouses').then(r => r.json()).then(setWarehouses);
-  }, []);
+  };
+  useEffect(load, []);
 
-  const openDrawer = (s) => { setSelected(s); setTab('parties'); };
+  const openDrawer = (s) => { setSelected(s); setEdit({ ...s }); setTab('parties'); };
   const closeDrawer = () => setSelected(null);
-
   const customerName = (id) => customers.find(c => c.id === id)?.name || '—';
   const warehouseName = (id) => warehouses.find(w => w.id === id)?.name || '—';
-  const warehouse = (id) => warehouses.find(w => w.id === id) || {};
 
-  const th = { textAlign: 'left', padding: '10px 12px', fontSize: 12, color: '#64748b', fontWeight: 600, borderBottom: '1px solid #e5e7eb' };
-  const td = { padding: '10px 12px', fontSize: 13, borderBottom: '1px solid #f1f5f9' };
+  const save = async () => {
+    await fetch(`/api/shipments/${selected.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(edit),
+    });
+    load();
+    alert('Saved');
+  };
+
+  const input = 'w-full border border-slate-200 rounded-md px-3 py-2 text-sm';
 
   return (
     <div>
-      <h1 style={{ fontSize: 24, fontWeight: 700, color: '#0f172a', marginBottom: 16 }}>Shipments</h1>
+      <h1 className="text-2xl font-bold text-slate-800 mb-4">Shipments</h1>
 
-      <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 8, overflow: 'auto' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-          <thead>
-            <tr style={{ background: '#f8fafc' }}>
-              <th style={th}>Master AWB</th>
-              <th style={th}>Customer</th>
-              <th style={th}>Route</th>
-              <th style={th}>Boxes</th>
-              <th style={th}>Status</th>
-              <th style={th}>Created</th>
+      <div className="bg-white border border-slate-200 rounded-xl overflow-hidden">
+        <table className="w-full text-sm">
+          <thead className="bg-slate-50">
+            <tr className="text-left text-slate-500">
+              <th className="py-3 px-4">Master AWB</th>
+              <th className="py-3 px-4">Customer</th>
+              <th className="py-3 px-4">Route</th>
+              <th className="py-3 px-4">Train</th>
+              <th className="py-3 px-4">Status</th>
+              <th className="py-3 px-4">Created</th>
             </tr>
           </thead>
           <tbody>
             {shipments.map(s => (
-              <tr key={s.id} onClick={() => openDrawer(s)} style={{ cursor: 'pointer' }}
-                onMouseEnter={e => e.currentTarget.style.background = '#f8fafc'}
-                onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
-                <td style={{ ...td, fontFamily: 'monospace', fontWeight: 600 }}>{s.masterAWB}</td>
-                <td style={td}>{customerName(s.customerId)}</td>
-                <td style={td}>{warehouseName(s.pickupWarehouseId)} → {warehouseName(s.deliveryWarehouseId)}</td>
-                <td style={td}>{s.boxAWBs?.length || 0}</td>
-                <td style={td}>
-                  <span style={{ background: '#dbeafe', color: '#1d4ed8', fontSize: 11, padding: '2px 8px', borderRadius: 999 }}>BOOKED</span>
-                </td>
-                <td style={{ ...td, color: '#64748b' }}>{s.createdAt ? new Date(s.createdAt).toLocaleDateString() : '—'}</td>
+              <tr key={s.id} onClick={() => openDrawer(s)} className="border-t border-slate-100 hover:bg-slate-50 cursor-pointer">
+                <td className="py-3 px-4 font-mono font-medium">{s.masterAWB}</td>
+                <td className="py-3 px-4">{customerName(s.customerId)}</td>
+                <td className="py-3 px-4 text-xs">{warehouseName(s.pickupWarehouseId)} → {warehouseName(s.deliveryWarehouseId)}</td>
+                <td className="py-3 px-4 font-mono text-xs">{s.trainNumber || '—'}</td>
+                <td className="py-3 px-4"><span className="bg-blue-100 text-blue-700 text-xs px-2 py-0.5 rounded-full">BOOKED</span></td>
+                <td className="py-3 px-4 text-slate-500 text-xs">{s.createdAt ? new Date(s.createdAt).toLocaleDateString() : '—'}</td>
               </tr>
             ))}
           </tbody>
         </table>
-        {shipments.length === 0 && <p style={{ color: '#64748b', fontSize: 13, padding: 24, textAlign: 'center' }}>No shipments yet.</p>}
+        {shipments.length === 0 && <p className="text-slate-500 text-sm py-8 text-center">No shipments yet.</p>}
       </div>
 
       {selected && (
         <>
-          <div onClick={closeDrawer} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 40 }} />
-          <div style={{
-            position: 'fixed', top: 0, right: 0, height: '100%', width: '100%', maxWidth: 480,
-            background: '#fff', boxShadow: '-4px 0 24px rgba(0,0,0,0.15)', zIndex: 50,
-            display: 'flex', flexDirection: 'column',
-          }}>
-            <div style={{ padding: 20, borderBottom: '1px solid #e5e7eb', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div className="fixed inset-0 bg-black/40 z-40" onClick={closeDrawer} />
+          <div className="fixed right-0 top-0 h-full w-full max-w-lg bg-white shadow-2xl z-50 flex flex-col">
+            <div className="p-5 border-b flex justify-between items-center">
               <div>
-                <h2 style={{ margin: 0, fontSize: 18, fontFamily: 'monospace', fontWeight: 700 }}>{selected.masterAWB}</h2>
-                <p style={{ margin: '4px 0 0', fontSize: 12, color: '#64748b' }}>{customerName(selected.customerId)}</p>
+                <h2 className="font-bold text-lg font-mono">{selected.masterAWB}</h2>
+                <p className="text-xs text-slate-500">{customerName(selected.customerId)}</p>
               </div>
-              <button onClick={closeDrawer} style={{ background: 'none', border: 'none', fontSize: 24, color: '#94a3b8', cursor: 'pointer' }}>×</button>
+              <button onClick={closeDrawer} className="text-slate-400 hover:text-slate-600 text-2xl">×</button>
             </div>
 
-            <div style={{ display: 'flex', borderBottom: '1px solid #e5e7eb', fontSize: 13 }}>
-              {[
-                { id: 'parties', label: 'Shipper & Receiver' },
-                { id: 'details', label: 'Shipment Details' },
-                { id: 'invoice', label: 'Invoice & E-way' },
-              ].map(t => (
-                <button
-                  key={t.id}
-                  onClick={() => setTab(t.id)}
-                  style={{
-                    padding: '12px 16px', background: 'none', border: 'none', cursor: 'pointer',
-                    fontWeight: 600, color: tab === t.id ? '#0074ff' : '#64748b',
-                    borderBottom: tab === t.id ? '2px solid #0074ff' : '2px solid transparent',
-                  }}
-                >
-                  {t.label}
-                </button>
+            <div className="flex border-b text-sm">
+              {[{id:'parties',l:'Parties'},{id:'details',l:'Details'},{id:'train',l:'Train'},{id:'invoice',l:'Invoice'}].map(t => (
+                <button key={t.id} onClick={() => setTab(t.id)} className={`px-4 py-3 font-medium ${tab===t.id ? 'border-b-2 border-brand text-brand' : 'text-slate-500'}`}>{t.l}</button>
               ))}
             </div>
 
-            <div style={{ flex: 1, overflowY: 'auto', padding: 20, fontSize: 13 }}>
+            <div className="flex-1 overflow-y-auto p-5 text-sm space-y-4">
               {tab === 'parties' && (
-                <div>
-                  <h3 style={{ fontSize: 14, fontWeight: 600, marginBottom: 8 }}>Shipper (Consignor)</h3>
-                  <div style={{ background: '#f8fafc', padding: 12, borderRadius: 6, marginBottom: 16 }}>
-                    <p style={{ margin: 0, fontWeight: 600 }}>{warehouse(selected.pickupWarehouseId).name || '—'}</p>
-                    <p style={{ margin: '4px 0 0', color: '#475569' }}>{warehouse(selected.pickupWarehouseId).address}</p>
-                    <p style={{ margin: '2px 0 0', color: '#475569' }}>
-                      {[warehouse(selected.pickupWarehouseId).city, warehouse(selected.pickupWarehouseId).state, warehouse(selected.pickupWarehouseId).pin].filter(Boolean).join(', ')}
-                    </p>
+                <>
+                  <div>
+                    <label className="text-xs font-semibold text-slate-500 block mb-1">Pickup Hub</label>
+                    <select className={input} value={edit.pickupWarehouseId || ''} onChange={e => setEdit({...edit, pickupWarehouseId: e.target.value})}>
+                      {warehouses.map(w => <option key={w.id} value={w.id}>{w.name}</option>)}
+                    </select>
                   </div>
-                  <h3 style={{ fontSize: 14, fontWeight: 600, marginBottom: 8 }}>Receiver (Consignee)</h3>
-                  <div style={{ background: '#f8fafc', padding: 12, borderRadius: 6 }}>
-                    <p style={{ margin: 0, fontWeight: 600 }}>{warehouse(selected.deliveryWarehouseId).name || '—'}</p>
-                    <p style={{ margin: '4px 0 0', color: '#475569' }}>{warehouse(selected.deliveryWarehouseId).address}</p>
-                    <p style={{ margin: '2px 0 0', color: '#475569' }}>
-                      {[warehouse(selected.deliveryWarehouseId).city, warehouse(selected.deliveryWarehouseId).state, warehouse(selected.deliveryWarehouseId).pin].filter(Boolean).join(', ')}
-                    </p>
+                  <div>
+                    <label className="text-xs font-semibold text-slate-500 block mb-1">Drop Hub</label>
+                    <select className={input} value={edit.deliveryWarehouseId || ''} onChange={e => setEdit({...edit, deliveryWarehouseId: e.target.value})}>
+                      {warehouses.map(w => <option key={w.id} value={w.id}>{w.name}</option>)}
+                    </select>
                   </div>
-                </div>
+                </>
               )}
               {tab === 'details' && (
-                <div>
-                  <p style={{ margin: '0 0 8px' }}><strong>Boxes:</strong> {selected.boxAWBs?.length || 0}</p>
-                  <p style={{ margin: '0 0 8px' }}><strong>Product:</strong> {selected.productDescription || '—'}</p>
-                  <p style={{ margin: '0 0 8px' }}><strong>Remarks:</strong> {selected.remarks || '—'}</p>
-                  {selected.boxes && Array.isArray(selected.boxes) && selected.boxes.length > 0 && (
-                    <div style={{ marginTop: 12 }}>
-                      <strong>Box types</strong>
-                      {selected.boxes.map((b, i) => (
-                        <div key={i} style={{ background: '#f8fafc', padding: 8, borderRadius: 4, marginTop: 6, fontSize: 12 }}>
-                          Count: {b.count} • Weight: {b.weight || '—'} kg • {b.length || '—'}×{b.width || '—'}×{b.height || '—'} cm
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
+                <>
+                  <div>
+                    <label className="text-xs font-semibold text-slate-500 block mb-1">Product Description</label>
+                    <textarea className={input} rows={3} value={edit.productDescription || ''} onChange={e => setEdit({...edit, productDescription: e.target.value})} />
+                  </div>
+                  <div>
+                    <label className="text-xs font-semibold text-slate-500 block mb-1">Remarks</label>
+                    <textarea className={input} rows={2} value={edit.remarks || ''} onChange={e => setEdit({...edit, remarks: e.target.value})} />
+                  </div>
+                </>
+              )}
+              {tab === 'train' && (
+                <>
+                  <div>
+                    <label className="text-xs font-semibold text-slate-500 block mb-1">Train Number</label>
+                    <input className={input} placeholder="e.g. 12301" value={edit.trainNumber || ''} onChange={e => setEdit({...edit, trainNumber: e.target.value})} />
+                  </div>
+                  <div>
+                    <label className="text-xs font-semibold text-slate-500 block mb-1">Train Date</label>
+                    <input type="date" className={input} value={edit.trainDate || ''} onChange={e => setEdit({...edit, trainDate: e.target.value})} />
+                  </div>
+                  <div>
+                    <label className="text-xs font-semibold text-slate-500 block mb-1">Status</label>
+                    <select className={input} value={edit.trainStatus || ''} onChange={e => setEdit({...edit, trainStatus: e.target.value})}>
+                      <option value="">—</option>
+                      <option value="scheduled">Scheduled</option>
+                      <option value="on-time">On Time</option>
+                      <option value="delayed">Delayed</option>
+                      <option value="reached">Reached</option>
+                    </select>
+                  </div>
+                  <p className="text-xs text-slate-400">Train number and date will be used for railway API tracking.</p>
+                </>
               )}
               {tab === 'invoice' && (
-                <div>
-                  <p style={{ margin: '0 0 8px' }}><strong>Invoice No:</strong> {selected.invoiceNumber || '—'}</p>
-                  <p style={{ margin: '0 0 8px' }}><strong>Amount:</strong> ₹{selected.invoiceAmount || 0}</p>
-                  <p style={{ margin: '0 0 16px' }}><strong>Insurance:</strong> {selected.insurance ? 'Yes' : 'No'}</p>
-                  <h3 style={{ fontSize: 14, fontWeight: 600, marginBottom: 8 }}>E-way Bill</h3>
-                  <p style={{ color: '#64748b' }}>Not uploaded yet</p>
-                </div>
+                <>
+                  <div>
+                    <label className="text-xs font-semibold text-slate-500 block mb-1">Invoice Number</label>
+                    <input className={input} value={edit.invoiceNumber || ''} onChange={e => setEdit({...edit, invoiceNumber: e.target.value})} />
+                  </div>
+                  <div>
+                    <label className="text-xs font-semibold text-slate-500 block mb-1">Amount (₹)</label>
+                    <input className={input} value={edit.invoiceAmount || ''} onChange={e => setEdit({...edit, invoiceAmount: e.target.value})} />
+                  </div>
+                  <label className="flex items-center gap-2">
+                    <input type="checkbox" checked={!!edit.insurance} onChange={e => setEdit({...edit, insurance: e.target.checked})} />
+                    Insurance
+                  </label>
+                </>
               )}
             </div>
 
-            <div style={{ padding: 16, borderTop: '1px solid #e5e7eb' }}>
-              <a href={`/api/labels/${selected.id}`} download style={{
-                display: 'block', textAlign: 'center', background: '#059669', color: '#fff',
-                padding: '10px 16px', borderRadius: 6, textDecoration: 'none', fontWeight: 600, fontSize: 14,
-              }}>
-                Download Shipping Labels
-              </a>
+            <div className="p-4 border-t flex gap-2">
+              <button onClick={save} className="flex-1 bg-brand text-white py-2.5 rounded-lg font-semibold text-sm">Save Changes</button>
+              <a href={`/api/labels/${selected.id}`} download className="flex-1 text-center bg-emerald-600 text-white py-2.5 rounded-lg font-semibold text-sm">Labels</a>
             </div>
           </div>
         </>
