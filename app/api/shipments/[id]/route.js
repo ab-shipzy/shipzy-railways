@@ -13,9 +13,16 @@ export async function PUT(req, { params }) {
     `UPDATE shipments SET
       pickup_warehouse_id=$1, delivery_warehouse_id=$2,
       invoice_number=$3, invoice_amount=$4, insurance=$5,
-      product_description=$6, remarks=$7
-     WHERE id=$8`,
-    [body.pickupWarehouseId, body.deliveryWarehouseId, body.invoiceNumber, body.invoiceAmount, body.insurance, body.productDescription, body.remarks, id]
+      product_description=$6, remarks=$7,
+      train_number=$8, train_date=$9, train_status=$10
+     WHERE id=$11`,
+    [
+      body.pickupWarehouseId, body.deliveryWarehouseId,
+      body.invoiceNumber, body.invoiceAmount, body.insurance,
+      body.productDescription, body.remarks,
+      body.trainNumber, body.trainDate, body.trainStatus,
+      id,
+    ]
   );
   return NextResponse.json({ ok: true });
 }
