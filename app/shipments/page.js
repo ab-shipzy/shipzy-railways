@@ -9,6 +9,8 @@ export default function ShipmentsPage() {
   const [selected, setSelected] = useState(null);
   const [tab, setTab] = useState('parties');
   const [edit, setEdit] = useState({});
+  const [live, setLive] = useState(null);
+  const [tracking, setTracking] = useState(false);
 
   const load = () => {
     fetch('/api/shipments').then(r => r.json()).then(setShipments);
@@ -17,7 +19,7 @@ export default function ShipmentsPage() {
   };
   useEffect(load, []);
 
-  const openDrawer = (s) => { setSelected(s); setEdit({ ...s }); setTab('parties'); };
+  const openDrawer = (s) => { setSelected(s); setEdit({ ...s }); setTab('parties'); setLive(null); };
   const closeDrawer = () => setSelected(null);
   const customerName = (id) => customers.find(c => c.id === id)?.name || '—';
   const warehouseName = (id) => warehouses.find(w => w.id === id)?.name || '—';
@@ -30,6 +32,15 @@ export default function ShipmentsPage() {
     });
     load();
     alert('Saved');
+  };
+
+  const track = async () => {
+    if (!edit.trainNumber) return alert('Enter train number first');
+    setTracking(true);
+    const res = await fetch(`/api/trains/${edit.trainNumber}?date=${edit.trainDate || ''}`);
+    const data = await res.json();
+    setLive(data);
+    setTracking(false);
   };
 
   const input = 'w-full border border-slate-200 rounded-md px-3 py-2 text-sm';
@@ -133,7 +144,19 @@ export default function ShipmentsPage() {
                       <option value="reached">Reached</option>
                     </select>
                   </div>
-                  <p className="text-xs text-slate-400">Train number and date will be used for railway API tracking.</p>
+                  <button onClick={track} disabled={tracking} className="w-full bg-slate-800 text-white py-2.5 rounded-md text-sm font-medium">
+                    {tracking ? 'Tracking...' : 'Track Train'}
+                  </button>
+                  {live && !live.error && (
+                    <div className="p-3 bg-slate-50 rounded-md text-xs space-y-1">
+                      <p className="font-semibold text-slate-700">{live.name || live.number || 'Train'}</p>
+                      <p>Status: {live.current_position?.status || live.status || '—'}</p>
+                      <p>Delay: {live.current_position?.delay || '—'}</p>
+                      <p>Position: {live.current_position?.name || '—'}</p>
+                    </div>
+                  )}
+                  {live && live.error && <p className="text-xs text-red-500">Could not fetch status. Check train number.</p>}
+                  <p className="text-xs text-slate-400">Live status via TrainTrack API.</p>
                 </>
               )}
               {tab === 'invoice' && (
