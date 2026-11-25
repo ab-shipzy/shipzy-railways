@@ -16,7 +16,6 @@ const tabs = [
 
 export default function Sidebar({ children }) {
   const path = usePathname();
-  const [menuOpen, setMenuOpen] = useState(false);
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -32,22 +31,25 @@ export default function Sidebar({ children }) {
             <span style={{ fontWeight: 600, color: '#0a1b3d', fontSize: 15 }}>Shipzy Railways</span>
           </Link>
 
-          <nav style={{ display: 'flex', gap: 4, marginLeft: 24, flex: 1 }}>
-            {tabs.map(t => (
-              <Link key={t.href} href={t.href} style={{
-                padding: '8px 14px', borderRadius: 20, textDecoration: 'none', fontSize: 13,
-                fontWeight: path === t.href ? 600 : 500,
-                color: path === t.href ? '#146bff' : '#5b6b82',
-                background: path === t.href ? 'rgba(20,107,255,0.08)' : 'transparent',
-                transition: 'all 0.15s ease',
-              }}>
-                {t.label}
-              </Link>
-            ))}
+          <nav style={{ display: 'flex', gap: 2, marginLeft: 16, flex: 1, overflowX: 'auto' }}>
+            {tabs.map(t => {
+              const active = path === t.href || (t.href !== '/' && path.startsWith(t.href));
+              return (
+                <Link key={t.href} href={t.href} prefetch style={{
+                  padding: '8px 14px', borderRadius: 20, textDecoration: 'none', fontSize: 13,
+                  fontWeight: active ? 600 : 500, whiteSpace: 'nowrap',
+                  color: active ? '#146bff' : '#5b6b82',
+                  background: active ? 'rgba(20,107,255,0.1)' : 'transparent',
+                  transition: 'all 0.15s ease',
+                }}>
+                  {t.label}
+                </Link>
+              );
+            })}
           </nav>
 
           <input type="search" placeholder="Search..." style={{
-            width: 180, border: '1px solid #e5eaf3', borderRadius: 20,
+            width: 160, border: '1px solid #e5eaf3', borderRadius: 20,
             padding: '8px 14px', fontSize: 13, background: '#fff', outline: 'none',
           }} />
         </div>
