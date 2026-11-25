@@ -2,7 +2,7 @@ import { getShipments, addShipment, nextAWB } from '../../../lib/db';
 
 export async function GET() {
   const shipments = await getShipments();
-  return Response.json(shipments);
+  return Response.json(shipments, { headers: { 'Cache-Control': 'no-store, max-age=0' } });
 }
 
 export async function POST(req) {
