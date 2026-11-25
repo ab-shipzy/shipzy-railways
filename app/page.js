@@ -19,59 +19,62 @@ export default function Dashboard() {
       let t = 0, tm = 0, l = 0;
       s.forEach(sh => {
         const d = sh.trainDate || '';
-        if (d === today) t++;
-        else if (d === tom) tm++;
-        else if (d > tom) l++;
+        if (d === today) t++; else if (d === tom) tm++; else if (d > tom) l++;
       });
       setTrains({ today: t, tomorrow: tm, later: l });
     });
   }, []);
 
-  const cards = [
-    { label: 'Shipments', value: counts.shipments, href: '/shipments', icon: '📦', color: 'bg-blue-50 text-blue-700' },
-    { label: 'Customers', value: counts.customers, href: '/customers', icon: '👥', color: 'bg-emerald-50 text-emerald-700' },
-    { label: 'Warehouses', value: counts.warehouses, href: '/warehouses', icon: '🏭', color: 'bg-amber-50 text-amber-700' },
-  ];
+  const card = { background: '#fff', border: '1px solid #e5eaf3', borderRadius: 16, padding: 20 };
 
   return (
-    <div className="max-w-5xl">
-      <h1 className="text-2xl font-bold text-slate-800 mb-1">Dashboard</h1>
-      <p className="text-slate-500 text-sm mb-6">Railway logistics overview</p>
+    <div style={{ maxWidth: 900 }}>
+      <h1 style={{ fontSize: 24, fontWeight: 700, margin: '0 0 4px', color: '#0a1b3d' }}>Dashboard</h1>
+      <p style={{ margin: '0 0 24px', fontSize: 14, color: '#5b6b82' }}>Railway logistics overview</p>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-        {cards.map(c => (
-          <Link key={c.label} href={c.href} className="bg-white border border-slate-200 rounded-xl p-5 hover:shadow-md transition">
-            <div className={`w-10 h-10 rounded-lg flex items-center justify-center text-xl mb-3 ${c.color}`}>{c.icon}</div>
-            <p className="text-xs text-slate-500 uppercase tracking-wide">{c.label}</p>
-            <p className="text-3xl font-bold text-slate-800 mt-1">{c.value}</p>
-          </Link>
-        ))}
-      </div>
-
-      <h2 className="text-lg font-semibold text-slate-800 mb-3">Train Arrivals</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-        <div className="bg-white border border-slate-200 rounded-xl p-5">
-          <div className="flex items-center gap-2 mb-2"><span className="text-lg">🟢</span><span className="text-sm font-medium text-slate-600">Today</span></div>
-          <p className="text-3xl font-bold text-emerald-600">{trains.today}</p>
-          <p className="text-xs text-slate-400 mt-1">trains reaching today</p>
+      <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', marginBottom: 28 }}>
+        <div style={{ ...card, flex: 1, minWidth: 160 }}>
+          <p style={{ margin: 0, fontSize: 12, color: '#5b6b82', fontWeight: 500 }}>Shipments</p>
+          <p style={{ margin: '8px 0 0', fontSize: 32, fontWeight: 700, color: '#146bff' }}>{counts.shipments}</p>
         </div>
-        <div className="bg-white border border-slate-200 rounded-xl p-5">
-          <div className="flex items-center gap-2 mb-2"><span className="text-lg">🟡</span><span className="text-sm font-medium text-slate-600">Tomorrow</span></div>
-          <p className="text-3xl font-bold text-amber-600">{trains.tomorrow}</p>
-          <p className="text-xs text-slate-400 mt-1">trains reaching tomorrow</p>
+        <div style={{ ...card, flex: 1, minWidth: 160 }}>
+          <p style={{ margin: 0, fontSize: 12, color: '#5b6b82', fontWeight: 500 }}>Customers</p>
+          <p style={{ margin: '8px 0 0', fontSize: 32, fontWeight: 700, color: '#0a1b3d' }}>{counts.customers}</p>
         </div>
-        <div className="bg-white border border-slate-200 rounded-xl p-5">
-          <div className="flex items-center gap-2 mb-2"><span className="text-lg">🔵</span><span className="text-sm font-medium text-slate-600">Later</span></div>
-          <p className="text-3xl font-bold text-blue-600">{trains.later}</p>
-          <p className="text-xs text-slate-400 mt-1">upcoming trains</p>
+        <div style={{ ...card, flex: 1, minWidth: 160 }}>
+          <p style={{ margin: 0, fontSize: 12, color: '#5b6b82', fontWeight: 500 }}>Warehouses</p>
+          <p style={{ margin: '8px 0 0', fontSize: 32, fontWeight: 700, color: '#0a1b3d' }}>{counts.warehouses}</p>
         </div>
       </div>
 
-      <h2 className="text-lg font-semibold text-slate-800 mb-3">Quick Actions</h2>
-      <div className="flex flex-wrap gap-3">
-        <Link href="/booking" className="bg-brand text-white px-5 py-2.5 rounded-lg font-semibold text-sm hover:bg-brand-deep">+ New Booking</Link>
-        <Link href="/shipments" className="bg-white border border-slate-200 px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-slate-50">View Shipments</Link>
-        <Link href="/customers" className="bg-white border border-slate-200 px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-slate-50">Add Customer</Link>
+      <h2 style={{ fontSize: 16, fontWeight: 600, margin: '0 0 12px', color: '#0a1b3d' }}>Train Arrivals</h2>
+      <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', marginBottom: 28 }}>
+        <div style={{ ...card, flex: 1, minWidth: 140 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+            <span style={{ width: 8, height: 8, borderRadius: 4, background: '#00b8c9' }} />
+            <span style={{ fontSize: 13, color: '#5b6b82' }}>Today</span>
+          </div>
+          <p style={{ margin: 0, fontSize: 28, fontWeight: 700, color: '#00b8c9' }}>{trains.today}</p>
+        </div>
+        <div style={{ ...card, flex: 1, minWidth: 140 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+            <span style={{ width: 8, height: 8, borderRadius: 4, background: '#f59e0b' }} />
+            <span style={{ fontSize: 13, color: '#5b6b82' }}>Tomorrow</span>
+          </div>
+          <p style={{ margin: 0, fontSize: 28, fontWeight: 700, color: '#f59e0b' }}>{trains.tomorrow}</p>
+        </div>
+        <div style={{ ...card, flex: 1, minWidth: 140 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+            <span style={{ width: 8, height: 8, borderRadius: 4, background: '#146bff' }} />
+            <span style={{ fontSize: 13, color: '#5b6b82' }}>Later</span>
+          </div>
+          <p style={{ margin: 0, fontSize: 28, fontWeight: 700, color: '#146bff' }}>{trains.later}</p>
+        </div>
+      </div>
+
+      <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+        <Link href="/booking" style={{ background: '#146bff', color: '#fff', padding: '10px 20px', borderRadius: 20, textDecoration: 'none', fontWeight: 600, fontSize: 14 }}>+ New Booking</Link>
+        <Link href="/shipments" style={{ background: '#fff', border: '1px solid #e5eaf3', color: '#0a1b3d', padding: '10px 20px', borderRadius: 20, textDecoration: 'none', fontWeight: 500, fontSize: 14 }}>View Shipments</Link>
       </div>
     </div>
   );

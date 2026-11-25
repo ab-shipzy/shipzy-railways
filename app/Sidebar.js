@@ -8,38 +8,47 @@ export default function Sidebar({ children }) {
 
   return (
     <>
-      {open && <div className="fixed inset-0 bg-black/40 z-40 md:hidden" onClick={() => setOpen(false)} />}
+      {open && <div onClick={() => setOpen(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.3)', zIndex: 40 }} />}
 
-      <aside className={`fixed top-0 left-0 h-full w-60 bg-[#00304a] text-slate-200 flex flex-col z-50 transition-transform ${open ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0`}>
-        <div className="px-5 py-6 border-b border-white/10 flex justify-between items-center">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 bg-[#0074ff] rounded flex items-center justify-center font-bold text-white text-sm">S</div>
-            <div>
-              <div className="text-sm font-semibold text-white">SHIPZY</div>
-              <div className="text-[10px] text-slate-300 uppercase tracking-wider">Railways</div>
-            </div>
+      <aside style={{
+        position: 'fixed', top: 0, left: 0, height: '100%', width: 240,
+        background: '#fff', borderRight: '1px solid #e5eaf3', zIndex: 50,
+        transform: open ? 'translateX(0)' : 'translateX(-100%)',
+        transition: 'transform 0.2s ease', display: 'flex', flexDirection: 'column',
+      }}>
+        <div style={{ padding: '20px 16px', borderBottom: '1px solid #e5eaf3', display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div style={{ width: 32, height: 32, background: '#146bff', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: 14 }}>S</div>
+          <div>
+            <div style={{ fontSize: 14, fontWeight: 600, color: '#0a1b3d' }}>Shipzy</div>
+            <div style={{ fontSize: 11, color: '#5b6b82' }}>Railways</div>
           </div>
-          <button onClick={() => setOpen(false)} className="md:hidden text-white text-xl">×</button>
         </div>
-        <nav className="flex-1 px-3 py-4 space-y-0.5 text-[13px] overflow-y-auto">
-          <Link href="/" onClick={() => setOpen(false)} className="block px-3 py-2.5 rounded-md hover:bg-white/10 text-slate-200 hover:text-white">Dashboard</Link>
-          <Link href="/booking" onClick={() => setOpen(false)} className="block px-3 py-2.5 rounded-md hover:bg-white/10 text-slate-200 hover:text-white">New Booking</Link>
-          <Link href="/shipments" onClick={() => setOpen(false)} className="block px-3 py-2.5 rounded-md hover:bg-white/10 text-slate-200 hover:text-white">Shipments</Link>
-          <Link href="/customers" onClick={() => setOpen(false)} className="block px-3 py-2.5 rounded-md hover:bg-white/10 text-slate-200 hover:text-white">Customers</Link>
-          <div className="pt-4 pb-1 px-3 text-[10px] uppercase tracking-wider text-slate-400">Settings</div>
-          <Link href="/warehouses" onClick={() => setOpen(false)} className="block px-3 py-2.5 rounded-md hover:bg-white/10 text-slate-200 hover:text-white">Warehouses</Link>
-          <Link href="/stations" onClick={() => setOpen(false)} className="block px-3 py-2.5 rounded-md hover:bg-white/10 text-slate-200 hover:text-white">Stations</Link>
-          <Link href="/vendors" onClick={() => setOpen(false)} className="block px-3 py-2.5 rounded-md hover:bg-white/10 text-slate-200 hover:text-white">Vendors</Link>
+        <nav style={{ flex: 1, padding: 12, overflowY: 'auto' }}>
+          {[
+            { href: '/', label: 'Dashboard' },
+            { href: '/booking', label: 'New Booking' },
+            { href: '/shipments', label: 'Shipments' },
+            { href: '/customers', label: 'Customers' },
+          ].map(item => (
+            <Link key={item.href} href={item.href} onClick={() => setOpen(false)}
+              style={{ display: 'block', padding: '10px 12px', borderRadius: 8, color: '#0a1b3d', textDecoration: 'none', fontSize: 14, marginBottom: 2 }}>
+              {item.label}
+            </Link>
+          ))}
+          <div style={{ padding: '16px 12px 6px', fontSize: 11, letterSpacing: 0.5, color: '#5b6b82', fontWeight: 500 }}>SETTINGS</div>
+          <Link href="/warehouses" onClick={() => setOpen(false)} style={{ display: 'block', padding: '10px 12px', borderRadius: 8, color: '#0a1b3d', textDecoration: 'none', fontSize: 14 }}>Warehouses</Link>
+          <Link href="/stations" onClick={() => setOpen(false)} style={{ display: 'block', padding: '10px 12px', borderRadius: 8, color: '#0a1b3d', textDecoration: 'none', fontSize: 14 }}>Stations</Link>
+          <Link href="/vendors" onClick={() => setOpen(false)} style={{ display: 'block', padding: '10px 12px', borderRadius: 8, color: '#0a1b3d', textDecoration: 'none', fontSize: 14 }}>Vendors</Link>
         </nav>
-        <div className="px-5 py-4 text-[11px] text-slate-400 border-t border-white/10">Shipzy Railways • v1.0</div>
+        <div style={{ padding: 16, borderTop: '1px solid #e5eaf3', fontSize: 11, color: '#5b6b82' }}>Shipzy Railways</div>
       </aside>
 
-      <div className="md:ml-60 min-h-screen flex flex-col">
-        <header className="bg-white border-b border-[#e5e7eb] px-4 py-3 flex items-center gap-3 sticky top-0 z-30">
-          <button onClick={() => setOpen(true)} className="md:hidden text-2xl text-slate-600">☰</button>
-          <input type="search" placeholder="Search..." className="flex-1 border border-[#e5e7eb] rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0074ff]/30" />
+      <div style={{ minHeight: '100vh' }}>
+        <header style={{ background: 'rgba(255,255,255,0.8)', backdropFilter: 'blur(8px)', borderBottom: '1px solid #e5eaf3', padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 12, position: 'sticky', top: 0, zIndex: 30 }}>
+          <button onClick={() => setOpen(true)} style={{ background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: '#0a1b3d' }}>☰</button>
+          <input type="search" placeholder="Search..." style={{ flex: 1, maxWidth: 320, border: '1px solid #e5eaf3', borderRadius: 20, padding: '8px 16px', fontSize: 14, background: '#fff', outline: 'none' }} />
         </header>
-        <main className="flex-1 p-4 md:p-6">{children}</main>
+        <main style={{ padding: 20 }}>{children}</main>
       </div>
     </>
   );
