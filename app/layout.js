@@ -55,6 +55,10 @@ export default function RootLayout({ children }) {
               style={{ display: 'block', padding: '12px 12px', borderRadius: 6, color: '#e2e8f0', textDecoration: 'none' }}>
               Stations
             </Link>
+            <Link href="/vendors" onClick={() => setSidebarOpen(false)}
+              style={{ display: 'block', padding: '12px 12px', borderRadius: 6, color: '#e2e8f0', textDecoration: 'none' }}>
+              Vendors
+            </Link>
           </nav>
           <div style={{ padding: 16, borderTop: '1px solid rgba(255,255,255,0.1)', fontSize: 11, color: '#64748b' }}>
             Shipzy Railways • v1.0
