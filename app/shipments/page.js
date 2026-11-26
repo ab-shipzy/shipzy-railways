@@ -118,6 +118,46 @@ export default function ShipmentsPage() {
               ))}
             </div>
 
+            {tab === 'parties' && (
+              <div>
+                <label style={labelStyle}>Pickup Warehouse</label>
+                <select value={edit.pickupWarehouseId || ''} onChange={e => setEdit({...edit, pickupWarehouseId: e.target.value})} style={inputStyle}>
+                  <option value="">Select</option>
+                  {warehouses.map(w => <option key={w.id} value={w.id}>{w.name}</option>)}
+                </select>
+                <label style={labelStyle}>Delivery Warehouse</label>
+                <select value={edit.deliveryWarehouseId || ''} onChange={e => setEdit({...edit, deliveryWarehouseId: e.target.value})} style={inputStyle}>
+                  <option value="">Select</option>
+                  {warehouses.map(w => <option key={w.id} value={w.id}>{w.name}</option>)}
+                </select>
+              </div>
+            )}
+
+            {tab === 'details' && (
+              <div>
+                <label style={labelStyle}>Product Description</label>
+                <input value={edit.productDescription || ''} onChange={e => setEdit({...edit, productDescription: e.target.value})} style={inputStyle} />
+                <label style={labelStyle}>Remarks</label>
+                <input value={edit.remarks || ''} onChange={e => setEdit({...edit, remarks: e.target.value})} style={inputStyle} />
+                <label style={labelStyle}>Box Count</label>
+                <div style={{ fontSize: 13, color: '#5b6b82' }}>{(edit.boxes || []).reduce((s, b) => s + Number(b.count || 1), 0) || '—'}</div>
+              </div>
+            )}
+
+            {tab === 'invoice' && (
+              <div>
+                <label style={labelStyle}>Invoice Number</label>
+                <input value={edit.invoiceNumber || ''} onChange={e => setEdit({...edit, invoiceNumber: e.target.value})} style={inputStyle} />
+                <label style={labelStyle}>Invoice Amount</label>
+                <input value={edit.invoiceAmount || ''} onChange={e => setEdit({...edit, invoiceAmount: e.target.value})} style={inputStyle} />
+                <label style={labelStyle}>Insurance</label>
+                <select value={edit.insurance ? 'yes' : 'no'} onChange={e => setEdit({...edit, insurance: e.target.value === 'yes'})} style={inputStyle}>
+                  <option value="no">No</option>
+                  <option value="yes">Yes</option>
+                </select>
+              </div>
+            )}
+
             {tab === 'train' && (
               <div>
                 <label style={labelStyle}>Train Number</label>
