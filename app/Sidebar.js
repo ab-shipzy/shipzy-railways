@@ -8,10 +8,7 @@ const tabs = [
   { href: '/', label: 'Dashboard' },
   { href: '/booking', label: 'Booking' },
   { href: '/shipments', label: 'Shipments' },
-  { href: '/customers', label: 'Customers' },
-  { href: '/warehouses', label: 'Warehouses' },
-  { href: '/stations', label: 'Stations' },
-  { href: '/vendors', label: 'Vendors' },
+  { href: '/settings', label: 'Settings' },
 ];
 
 export default function Sidebar({ children }) {
