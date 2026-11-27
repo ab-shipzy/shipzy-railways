@@ -60,8 +60,11 @@ export default function Sidebar({ children }) {
               <span style={{ width: 6, height: 6, borderRadius: 3, background: '#10b981' }} />
               Synced
             </div>
-            <div style={{ fontSize: 12, color: '#5b6b82', padding: '4px 10px', background: '#f8fafc', borderRadius: 16 }}>
-              {time}
+            <div style={{ fontSize: 11, color: '#5b6b82', padding: '4px 10px', background: '#f8fafc', borderRadius: 16, display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span>{time}</span>
+              <span style={{ color: '#94a3b8' }}>|</span>
+              <span style={{ fontWeight: 500 }}>v1.2.0</span>
+              <span style={{ fontSize: 10, color: '#94a3b8' }}>AWB update</span>
             </div>
             <Link href="/booking" style={{
               background: '#0f172a', color: '#fff', padding: '6px 14px', borderRadius: 16,
