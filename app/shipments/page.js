@@ -7,7 +7,11 @@ export default function ShipmentsPage() {
   const [customers, setCustomers] = useState([]);
   const [warehouses, setWarehouses] = useState([]);
   const [stations, setStations] = useState([]);
+  const [vendors, setVendors] = useState([]);
   const [selected, setSelected] = useState(null);
+  const [selectedIds, setSelectedIds] = useState([]);
+  const [statusFilter, setStatusFilter] = useState('');
+  const [bulkTrain, setBulkTrain] = useState('');
   const [tab, setTab] = useState('parties');
   const [edit, setEdit] = useState({});
   const [live, setLive] = useState(null);
@@ -19,6 +23,7 @@ export default function ShipmentsPage() {
     fetch('/api/customers').then(r => r.json()).then(setCustomers);
     fetch('/api/warehouses').then(r => r.json()).then(setWarehouses);
     fetch('/api/stations').then(r => r.json()).then(setStations);
+    fetch('/api/vendors').then(r => r.json()).then(setVendors);
   };
   useEffect(load, []);
 
@@ -34,6 +39,48 @@ export default function ShipmentsPage() {
   const customerName = (id) => customers.find(c => c.id === id)?.name || '—';
   const warehouseName = (id) => warehouses.find(w => w.id === id)?.name || '—';
   const stationCode = (id) => stations.find(s => s.id === id)?.code || '—';
+  const vendorName = (id) => vendors.find(v => v.id === id)?.name || '—';
+  const boxCount = (s) => (s.boxAWBs || []).length || 1;
+  const formatDate = (d) => d ? new Date(d).toLocaleDateString('en-IN') : '—';
+
+  const toggleSelect = (id) => {
+    setSelectedIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
+  };
+  const toggleAll = () => {
+    setSelectedIds(selectedIds.length === filtered.length ? [] : filtered.map(s => s.id));
+  };
+  const bulkDelete = async () => {
+    if (!confirm(`Delete ${selectedIds.length} shipments?`)) return;
+    for (const id of selectedIds) {
+      await fetch(`/api/shipments/${id}`, { method: 'DELETE' });
+    }
+    setSelectedIds([]);
+    load();
+  };
+  const bulkStatus = async (status) => {
+    for (const id of selectedIds) {
+      await fetch(`/api/shipments/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ trainStatus: status }),
+      });
+    }
+    setSelectedIds([]);
+    load();
+  };
+  const bulkAddTrain = async () => {
+    if (!bulkTrain) return;
+    for (const id of selectedIds) {
+      await fetch(`/api/shipments/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ trainNumber: bulkTrain }),
+      });
+    }
+    setBulkTrain('');
+    setSelectedIds([]);
+    load();
+  };
 
   const save = async () => {
     await fetch(`/api/shipments/${selected.id}`, {
@@ -79,45 +126,80 @@ export default function ShipmentsPage() {
 
   const filtered = shipments.filter(s => {
     const q = search.toLowerCase();
-    return !q || s.masterAWB?.toLowerCase().includes(q) || customerName(s.customerId).toLowerCase().includes(q) || s.trainNumber?.includes(q);
+    const matchSearch = !q || s.masterAWB?.toLowerCase().includes(q) || customerName(s.customerId).toLowerCase().includes(q) || s.trainNumber?.includes(q) || vendorName(s.vendorId).toLowerCase().includes(q);
+    const matchStatus = !statusFilter || (s.trainStatus || 'booked') === statusFilter;
+    return matchSearch && matchStatus;
   });
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, flexWrap: 'wrap', gap: 8 }}>
         <h1 style={{ fontSize: 22, fontWeight: 700, color: '#0a1b3d', margin: 0 }}>Shipments</h1>
-        <input
-          type="search"
-          placeholder="Search AWB, customer, train..."
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          style={{ width: 280, border: '1px solid #e5eaf3', borderRadius: 20, padding: '8px 14px', fontSize: 13 }}
-        />
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+          <input
+            type="search"
+            placeholder="Spotlight search..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            style={{ width: 240, border: '1px solid #e5eaf3', borderRadius: 20, padding: '8px 14px', fontSize: 13 }}
+          />
+          <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} style={{ border: '1px solid #e5eaf3', borderRadius: 8, padding: '8px 12px', fontSize: 13 }}>
+            <option value="">All Status</option>
+            <option value="booked">Booked</option>
+            <option value="on-time">On Time</option>
+            <option value="delayed">Delayed</option>
+            <option value="delivered">Delivered</option>
+          </select>
+        </div>
       </div>
+
+      {selectedIds.length > 0 && (
+        <div style={{ background: '#f0f9ff', border: '1px solid #bae6fd', borderRadius: 8, padding: '10px 16px', marginBottom: 12, display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
+          <span style={{ fontSize: 13, fontWeight: 600 }}>{selectedIds.length} selected</span>
+          <select onChange={e => e.target.value && bulkStatus(e.target.value)} style={{ border: '1px solid #e5eaf3', borderRadius: 6, padding: '6px 10px', fontSize: 12 }}>
+            <option value="">Set Status</option>
+            <option value="booked">Booked</option>
+            <option value="on-time">On Time</option>
+            <option value="delayed">Delayed</option>
+            <option value="delivered">Delivered</option>
+          </select>
+          <input placeholder="Train number" value={bulkTrain} onChange={e => setBulkTrain(e.target.value)} style={{ width: 120, border: '1px solid #e5eaf3', borderRadius: 6, padding: '6px 10px', fontSize: 12 }} />
+          <button onClick={bulkAddTrain} style={{ background: '#0f172a', color: '#fff', border: 'none', padding: '6px 12px', borderRadius: 6, fontSize: 12, cursor: 'pointer' }}>Add Train</button>
+          <button onClick={bulkDelete} style={{ background: '#dc2626', color: '#fff', border: 'none', padding: '6px 12px', borderRadius: 6, fontSize: 12, cursor: 'pointer' }}>Delete</button>
+        </div>
+      )}
 
       <div style={{ background: '#fff', border: '1px solid #e5eaf3', borderRadius: 12, overflow: 'hidden' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
           <thead>
             <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e5eaf3' }}>
-              <th style={th}>AWB</th>
-              <th style={th}>Bill To</th>
+              <th style={th}><input type="checkbox" checked={selectedIds.length === filtered.length && filtered.length > 0} onChange={toggleAll} /></th>
+              <th style={th}>Date</th>
+              <th style={th}>Master AWB</th>
+              <th style={th}>Customer</th>
+              <th style={th}>Vendor</th>
               <th style={th}>Route</th>
               <th style={th}>Train</th>
+              <th style={th}>Boxes</th>
               <th style={th}>Status</th>
             </tr>
           </thead>
           <tbody>
             {filtered.map(s => (
-              <tr key={s.id} onClick={() => openDrawer(s)} style={{ borderBottom: '1px solid #f1f5f9', cursor: 'pointer' }}>
-                <td style={td}><span style={{ fontWeight: 600, color: '#0a1b3d' }}>{s.masterAWB}</span></td>
-                <td style={td}>{customerName(s.customerId)}</td>
-                <td style={td}>{s.originCode || stationCode(s.originStationId)} → {s.destCode || stationCode(s.destinationStationId)}</td>
-                <td style={td}>{s.trainNumber ? `${s.trainNumber} ${s.trainName || ''}` : '—'}</td>
+              <tr key={s.id} style={{ borderBottom: '1px solid #f1f5f9', background: selectedIds.includes(s.id) ? '#f0f9ff' : '#fff' }}>
+                <td style={td}><input type="checkbox" checked={selectedIds.includes(s.id)} onChange={() => toggleSelect(s.id)} onClick={e => e.stopPropagation()} /></td>
+                <td style={td} onClick={() => openDrawer(s)}>{formatDate(s.createdAt)}</td>
+                <td style={td} onClick={() => openDrawer(s)}><span style={{ fontWeight: 600, color: '#0a1b3d', cursor: 'pointer' }}>{s.masterAWB}</span></td>
+                <td style={td} onClick={() => openDrawer(s)}>{customerName(s.customerId)}</td>
+                <td style={td} onClick={() => openDrawer(s)}>{vendorName(s.vendorId)}</td>
+                <td style={td} onClick={() => openDrawer(s)}>{s.originCode || stationCode(s.originStationId)} → {s.destCode || stationCode(s.destinationStationId)}</td>
+                <td style={td} onClick={() => openDrawer(s)}>{s.trainNumber ? `${s.trainNumber} ${s.trainName || ''}` : '—'}</td>
+                <td style={td} onClick={() => openDrawer(s)}>{boxCount(s)}</td>
                 <td style={td}>
                   <span style={{
                     padding: '2px 8px', borderRadius: 10, fontSize: 11, fontWeight: 500,
-                    background: s.trainStatus === 'delayed' ? '#fef3c7' : s.trainStatus === 'on-time' ? '#d1fae5' : '#f1f5f9',
-                    color: s.trainStatus === 'delayed' ? '#92400e' : s.trainStatus === 'on-time' ? '#065f46' : '#64748b',
+                    background: s.trainStatus === 'delayed' ? '#fef3c7' : s.trainStatus === 'on-time' ? '#d1fae5' : s.trainStatus === 'delivered' ? '#dbeafe' : '#f1f5f9',
+                    color: s.trainStatus === 'delayed' ? '#92400e' : s.trainStatus === 'on-time' ? '#065f46' : s.trainStatus === 'delivered' ? '#1e40af' : '#64748b',
                   }}>{s.trainStatus || 'booked'}</span>
                 </td>
               </tr>
