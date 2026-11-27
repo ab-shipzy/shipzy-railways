@@ -62,7 +62,7 @@ export async function PUT(req, { params }) {
       product_description=$6, remarks=$7,
       train_number=$8, train_date=$9, train_status=$10,
       train_name=$11, origin_code=$12, dest_code=$13, origin_departure=$14, dest_eta=$15,
-      last_station=$14, delay_minutes=$15, costs=$16, revenues=$17
+      last_station=$16, delay_minutes=$17, costs=$18, revenues=$19
      WHERE id=$20`,
     [
       body.pickupWarehouseId, body.deliveryWarehouseId,
