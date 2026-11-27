@@ -111,7 +111,7 @@ export default function ShipmentsPage() {
               <tr key={s.id} onClick={() => openDrawer(s)} style={{ borderBottom: '1px solid #f1f5f9', cursor: 'pointer' }}>
                 <td style={td}><span style={{ fontWeight: 600, color: '#0a1b3d' }}>{s.masterAWB}</span></td>
                 <td style={td}>{customerName(s.customerId)}</td>
-                <td style={td}>{stationCode(s.originStationId)} → {stationCode(s.destinationStationId)}</td>
+                <td style={td}>{s.originCode || stationCode(s.originStationId)} → {s.destCode || stationCode(s.destinationStationId)}</td>
                 <td style={td}>{s.trainNumber ? `${s.trainNumber} ${s.trainName || ''}` : '—'}</td>
                 <td style={td}>
                   <span style={{
