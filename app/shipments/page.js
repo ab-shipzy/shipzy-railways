@@ -22,6 +22,13 @@ export default function ShipmentsPage() {
   };
   useEffect(load, []);
 
+  useEffect(() => {
+    if (edit.trainNumber && edit.trainNumber.length >= 4 && edit.trainDate && selected) {
+      const timer = setTimeout(() => track(), 500);
+      return () => clearTimeout(timer);
+    }
+  }, [edit.trainNumber, edit.trainDate]);
+
   const openDrawer = (s) => { setSelected(s); setEdit({ ...s }); setTab('parties'); setLive(null); };
   const closeDrawer = () => setSelected(null);
   const customerName = (id) => customers.find(c => c.id === id)?.name || '—';
@@ -39,12 +46,32 @@ export default function ShipmentsPage() {
   };
 
   const track = async () => {
-    if (!edit.trainNumber) return alert('Enter train number first');
+    if (!edit.trainNumber) return;
     setTracking(true);
     const res = await fetch(`/api/trains/${edit.trainNumber}?date=${edit.trainDate || ''}`);
     const data = await res.json();
-    setLive(data.data || data);
+    const liveData = data.data || data;
+    setLive(liveData);
     setTracking(false);
+    // Auto-save
+    if (liveData && !liveData.error) {
+      const updated = {
+        ...edit,
+        trainName: liveData.train_name || liveData.trainName,
+        originCode: liveData.originCode || liveData.stations?.[0]?.station_code,
+        destCode: liveData.destCode || liveData.stations?.[liveData.stations?.length - 1]?.station_code,
+        originDeparture: liveData.originDeparture || liveData.stations?.[0]?.scheduled_departure,
+        destEta: liveData.destEta || liveData.eta_destination_at,
+        trainStatus: liveData.status || (liveData.delay_minutes > 10 ? 'delayed' : 'on-time'),
+      };
+      setEdit(updated);
+      await fetch(`/api/shipments/${selected.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updated),
+      });
+      load();
+    }
   };
 
   const filtered = shipments.filter(s => {
