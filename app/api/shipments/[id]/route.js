@@ -84,3 +84,10 @@ export async function PUT(req, { params }) {
   );
   return NextResponse.json({ ok: true, trainDetails });
 }
+
+
+export async function DELETE(req, { params }) {
+  const { id } = params;
+  await pool.query('DELETE FROM shipments WHERE id = $1', [id]);
+  return NextResponse.json({ ok: true });
+}
