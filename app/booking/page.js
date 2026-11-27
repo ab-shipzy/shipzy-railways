@@ -4,21 +4,21 @@ import { useState, useEffect } from 'react';
 
 const sections = [
   { id: 'customer', title: 'Customer (Billing)', num: 1 },
-  { id: 'stations', title: 'Origin & Destination Stations', num: 2 },
-  { id: 'vendor', title: 'Vendor (Railway Agent)', num: 3 },
-  { id: 'hubs', title: 'Pickup & Drop Hubs', num: 4 },
-  { id: 'shipment', title: 'Shipment Details', num: 5 },
-  { id: 'invoice', title: 'Invoice', num: 6 },
+
+  { id: 'vendor', title: 'Vendor (Railway Agent)', num: 2 },
+  { id: 'hubs', title: 'Pickup & Drop Hubs', num: 3 },
+  { id: 'shipment', title: 'Shipment Details', num: 4 },
+  { id: 'invoice', title: 'Invoice', num: 5 },
 ];
 
 export default function BookingPage() {
   const [open, setOpen] = useState('customer');
   const [customers, setCustomers] = useState([]);
   const [warehouses, setWarehouses] = useState([]);
-  const [stations, setStations] = useState([]);
+  
   const [vendors, setVendors] = useState([]);
   const [form, setForm] = useState({
-    customerId: '', originStationId: '', destinationStationId: '', vendorId: '',
+    customerId: '', vendorId: '',
     pickupWarehouseId: '', deliveryWarehouseId: '',
     boxes: [{ count: 1, weight: '', length: '', width: '', height: '' }],
     invoiceNumber: '', invoiceAmount: '', insurance: false, productDescription: '', remarks: '',
@@ -32,14 +32,11 @@ export default function BookingPage() {
   useEffect(() => {
     fetch('/api/customers').then(r => r.json()).then(setCustomers);
     fetch('/api/warehouses').then(r => r.json()).then(setWarehouses);
-    fetch('/api/stations').then(r => r.json()).then(setStations);
+    
     fetch('/api/vendors').then(r => r.json()).then(setVendors);
   }, []);
 
-  const filterStations = (q) => stations.filter(s =>
-    (s.code || '').toLowerCase().includes(q.toLowerCase()) ||
-    (s.name || '').toLowerCase().includes(q.toLowerCase())
-  );
+  
   const filterWh = (q) => warehouses.filter(w =>
     (w.name || '').toLowerCase().includes(q.toLowerCase()) ||
     (w.city || '').toLowerCase().includes(q.toLowerCase())
@@ -93,26 +90,7 @@ export default function BookingPage() {
                   {customers.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                 </select>
               )}
-              {s.id === 'stations' && (
-                <>
-                  <label style={label}>Origin Station</label>
-                  <input style={input} placeholder="Type code or name..." value={searchOrigin} onChange={e => setSearchOrigin(e.target.value)} />
-                  {searchOrigin && filterStations(searchOrigin).map(st => (
-                    <div key={st.id} style={{ padding: 8, cursor: 'pointer', fontSize: 13, borderBottom: '1px solid #f1f5f9' }}
-                      onClick={() => { setForm({...form, originStationId: st.id}); setSearchOrigin(`${st.code} — ${st.name}`); }}>
-                      <strong>{st.code}</strong> — {st.name}
-                    </div>
-                  ))}
-                  <label style={{ ...label, marginTop: 12 }}>Destination Station</label>
-                  <input style={input} placeholder="Type code or name..." value={searchDest} onChange={e => setSearchDest(e.target.value)} />
-                  {searchDest && filterStations(searchDest).map(st => (
-                    <div key={st.id} style={{ padding: 8, cursor: 'pointer', fontSize: 13, borderBottom: '1px solid #f1f5f9' }}
-                      onClick={() => { setForm({...form, destinationStationId: st.id}); setSearchDest(`${st.code} — ${st.name}`); }}>
-                      <strong>{st.code}</strong> — {st.name}
-                    </div>
-                  ))}
-                </>
-              )}
+              
               {s.id === 'vendor' && (
                 <select style={input} value={form.vendorId} onChange={e => setForm({...form, vendorId: e.target.value})}>
                   <option value="">Select vendor</option>
