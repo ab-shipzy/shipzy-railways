@@ -70,7 +70,10 @@ export default function ShipmentsPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updated),
       });
-      load();
+      // Force refresh
+      const res = await fetch('/api/shipments');
+      const data = await res.json();
+      setShipments(data);
     }
   };
 
