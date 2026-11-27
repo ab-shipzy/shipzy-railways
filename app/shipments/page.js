@@ -211,13 +211,14 @@ export default function ShipmentsPage() {
 
       {selected && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.3)', zIndex: 50 }} onClick={closeDrawer}>
-          <div style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: 400, background: '#fff', padding: 20, overflowY: 'auto' }} onClick={e => e.stopPropagation()}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+          <div style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: 560, background: '#fff', padding: 20, overflowY: 'auto' }} onClick={e => e.stopPropagation()}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20, paddingBottom: 16, borderBottom: '1px solid #e5eaf3' }}>
               <div>
-                <div style={{ fontSize: 18, fontWeight: 700 }}>{selected.masterAWB}</div>
-                <div style={{ fontSize: 13, color: '#5b6b82' }}>{customerName(selected.customerId)}</div>
+                <div style={{ fontSize: 11, color: '#5b6b82', textTransform: 'uppercase', letterSpacing: 0.5 }}>Master AWB</div>
+                <div style={{ fontSize: 20, fontWeight: 700, color: '#0a1b3d', marginTop: 2 }}>{selected.masterAWB}</div>
+                <div style={{ fontSize: 13, color: '#5b6b82', marginTop: 4 }}>{customerName(selected.customerId)}</div>
               </div>
-              <button onClick={closeDrawer} style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer' }}>×</button>
+              <button onClick={closeDrawer} style={{ background: '#f1f5f9', border: 'none', width: 32, height: 32, borderRadius: 8, fontSize: 18, cursor: 'pointer', color: '#64748b' }}>×</button>
             </div>
 
             <div style={{ display: 'flex', gap: 4, marginBottom: 16, borderBottom: '1px solid #e5eaf3' }}>
