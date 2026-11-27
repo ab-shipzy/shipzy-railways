@@ -12,8 +12,10 @@ export async function POST(req) {
   const boxAWBs = [];
   let current = parseInt(master, 10);
   for (let i = 0; i < totalBoxes; i++) {
-    boxAWBs.push(String(current).padStart(8, '0'));
-    current += 11;
+    // Skip numbers with zeros
+    while (String(current).includes('0')) current++;
+    boxAWBs.push(String(current));
+    current++;
   }
   const shipment = await addShipment({
     ...body,
