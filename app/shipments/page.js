@@ -94,21 +94,26 @@ export default function ShipmentsPage() {
 
   const track = async () => {
     if (!edit.trainNumber) return;
+    // Use stored data if available
+    if (edit.trainName && edit.originCode && edit.destCode) {
+      setLive({ train_name: edit.trainName, originCode: edit.originCode, destCode: edit.destCode, originDeparture: edit.originDeparture, destEta: edit.destEta });
+      return;
+    }
     setTracking(true);
     const res = await fetch(`/api/trains/${edit.trainNumber}?date=${edit.trainDate || ''}`);
     const data = await res.json();
     const liveData = data.data || data;
     setLive(liveData);
     setTracking(false);
-    // Auto-save
+    // Save to database
     if (liveData && !liveData.error) {
       const updated = {
         ...edit,
-        trainName: liveData.train_name || liveData.trainName,
-        originCode: liveData.originCode || liveData.stations?.[0]?.station_code,
-        destCode: liveData.destCode || liveData.stations?.[liveData.stations?.length - 1]?.station_code,
-        originDeparture: liveData.originDeparture || liveData.stations?.[0]?.scheduled_departure,
-        destEta: liveData.destEta || liveData.eta_destination_at,
+        trainName: liveData.train_name || liveData.trainName || '',
+        originCode: liveData.originCode || liveData.stations?.[0]?.station_code || '',
+        destCode: liveData.destCode || liveData.stations?.[liveData.stations?.length - 1]?.station_code || '',
+        originDeparture: liveData.originDeparture || liveData.stations?.[0]?.scheduled_departure || '',
+        destEta: liveData.destEta || liveData.eta_destination_at || '',
         trainStatus: liveData.status || (liveData.delay_minutes > 10 ? 'delayed' : 'on-time'),
       };
       setEdit(updated);
@@ -117,10 +122,7 @@ export default function ShipmentsPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updated),
       });
-      // Force refresh
-      const res = await fetch('/api/shipments');
-      const data = await res.json();
-      setShipments(data);
+      load();
     }
   };
 
