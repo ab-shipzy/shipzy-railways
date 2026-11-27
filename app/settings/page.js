@@ -158,15 +158,15 @@ function CustomersTab() {
 
 function WarehousesTab() {
   const [items, setItems] = useState([]);
-  const [form, setForm] = useState({ name: '', address: '', city: '', state: '', pin: '', pocName: '', phone: '' });
+  const [form, setForm] = useState({ name: '', consigneeName: '', companyName: '', address: '', city: '', state: '', pin: '', phone: '' });
   const [editing, setEditing] = useState(null);
   const [show, setShow] = useState(false);
 
   const load = () => fetch('/api/warehouses').then(r => r.json()).then(setItems);
   useEffect(() => { load(); }, []);
 
-  const openNew = () => { setEditing(null); setForm({ name: '', address: '', city: '', state: '', pin: '', pocName: '', phone: '' }); setShow(true); };
-  const openEdit = (w) => { setEditing(w.id); setForm({ name: w.name, address: w.address, city: w.city, state: w.state, pin: w.pin, pocName: w.pocName, phone: w.phone }); setShow(true); };
+  const openNew = () => { setEditing(null); setForm({ name: '', consigneeName: '', companyName: '', address: '', city: '', state: '', pin: '', phone: '' }); setShow(true); };
+  const openEdit = (w) => { setEditing(w.id); setForm({ name: w.name, consigneeName: w.consigneeName, companyName: w.companyName, address: w.address, city: w.city, state: w.state, pin: w.pin, phone: w.phone }); setShow(true); };
 
   const save = async () => {
     if (editing) {
@@ -189,7 +189,9 @@ function WarehousesTab() {
       <button onClick={openNew} style={btnPrimary}>+ Add Warehouse</button>
       {show && (
         <div style={formBox}>
-          <input placeholder="Hub Name" value={form.name} onChange={e => setForm({...form, name: e.target.value})} style={inputStyle} />
+          <input placeholder="Hub Name (for identification)" value={form.name} onChange={e => setForm({...form, name: e.target.value})} style={inputStyle} />
+          <input placeholder="Consignee Name" value={form.consigneeName} onChange={e => setForm({...form, consigneeName: e.target.value})} style={inputStyle} />
+          <input placeholder="Company Name" value={form.companyName} onChange={e => setForm({...form, companyName: e.target.value})} style={inputStyle} />
           <input placeholder="Address" value={form.address} onChange={e => setForm({...form, address: e.target.value})} style={inputStyle} />
           <input placeholder="City" value={form.city} onChange={e => setForm({...form, city: e.target.value})} style={inputStyle} />
           <input placeholder="State" value={form.state} onChange={e => setForm({...form, state: e.target.value})} style={inputStyle} />
