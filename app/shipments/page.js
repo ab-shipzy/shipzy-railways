@@ -109,7 +109,7 @@ export default function ShipmentsPage() {
             </div>
 
             <div style={{ display: 'flex', gap: 4, marginBottom: 16, borderBottom: '1px solid #e5eaf3' }}>
-              {['parties', 'details', 'train', 'invoice'].map(t => (
+              {['parties', 'details', 'train', 'invoice', 'cost', 'revenue'].map(t => (
                 <button key={t} onClick={() => setTab(t)} style={{
                   padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 13,
                   fontWeight: tab === t ? 600 : 500, color: tab === t ? '#146bff' : '#5b6b82',
@@ -155,6 +155,46 @@ export default function ShipmentsPage() {
                   <option value="no">No</option>
                   <option value="yes">Yes</option>
                 </select>
+              </div>
+            )}
+
+            {tab === 'cost' && (
+              <div>
+                <label style={labelStyle}>Freight</label>
+                <input type="number" value={edit.costs?.freight || ''} onChange={e => setEdit({...edit, costs: {...edit.costs, freight: e.target.value}})} style={inputStyle} />
+                <label style={labelStyle}>Origin Pickup</label>
+                <input type="number" value={edit.costs?.originPickup || ''} onChange={e => setEdit({...edit, costs: {...edit.costs, originPickup: e.target.value}})} style={inputStyle} />
+                <label style={labelStyle}>Origin Station Parking</label>
+                <input type="number" value={edit.costs?.originParking || ''} onChange={e => setEdit({...edit, costs: {...edit.costs, originParking: e.target.value}})} style={inputStyle} />
+                <label style={labelStyle}>Destination Station Parking</label>
+                <input type="number" value={edit.costs?.destParking || ''} onChange={e => setEdit({...edit, costs: {...edit.costs, destParking: e.target.value}})} style={inputStyle} />
+                <label style={labelStyle}>Last Mile Delivery</label>
+                <input type="number" value={edit.costs?.lastMile || ''} onChange={e => setEdit({...edit, costs: {...edit.costs, lastMile: e.target.value}})} style={inputStyle} />
+                <label style={labelStyle}>Delivery Labour</label>
+                <input type="number" value={edit.costs?.labour || ''} onChange={e => setEdit({...edit, costs: {...edit.costs, labour: e.target.value}})} style={inputStyle} />
+                {(edit.costs?.extra || []).map((ex, i) => (
+                  <div key={i} style={{ display: 'flex', gap: 4, marginTop: 8 }}>
+                    <input placeholder="Name" value={ex.name} onChange={e => { const extra = [...edit.costs.extra]; extra[i].name = e.target.value; setEdit({...edit, costs: {...edit.costs, extra}}); }} style={{...inputStyle, flex: 1}} />
+                    <input type="number" placeholder="Amount" value={ex.amount} onChange={e => { const extra = [...edit.costs.extra]; extra[i].amount = e.target.value; setEdit({...edit, costs: {...edit.costs, extra}}); }} style={{...inputStyle, width: 80}} />
+                  </div>
+                ))}
+                <button onClick={() => setEdit({...edit, costs: {...edit.costs, extra: [...(edit.costs?.extra || []), {name: '', amount: ''}]}})} style={{ marginTop: 8, background: '#fff', border: '1px solid #e5eaf3', padding: '6px 12px', borderRadius: 6, fontSize: 12, cursor: 'pointer' }}>+ Add Cost</button>
+              </div>
+            )}
+
+            {tab === 'revenue' && (
+              <div>
+                <label style={labelStyle}>Freight Revenue</label>
+                <input type="number" value={edit.revenues?.freight || ''} onChange={e => setEdit({...edit, revenues: {...edit.revenues, freight: e.target.value}})} style={inputStyle} />
+                <label style={labelStyle}>Other Revenue</label>
+                <input type="number" value={edit.revenues?.other || ''} onChange={e => setEdit({...edit, revenues: {...edit.revenues, other: e.target.value}})} style={inputStyle} />
+                {(edit.revenues?.extra || []).map((ex, i) => (
+                  <div key={i} style={{ display: 'flex', gap: 4, marginTop: 8 }}>
+                    <input placeholder="Name" value={ex.name} onChange={e => { const extra = [...edit.revenues.extra]; extra[i].name = e.target.value; setEdit({...edit, revenues: {...edit.revenues, extra}}); }} style={{...inputStyle, flex: 1}} />
+                    <input type="number" placeholder="Amount" value={ex.amount} onChange={e => { const extra = [...edit.revenues.extra]; extra[i].amount = e.target.value; setEdit({...edit, revenues: {...edit.revenues, extra}}); }} style={{...inputStyle, width: 80}} />
+                  </div>
+                ))}
+                <button onClick={() => setEdit({...edit, revenues: {...edit.revenues, extra: [...(edit.revenues?.extra || []), {name: '', amount: ''}]}})} style={{ marginTop: 8, background: '#fff', border: '1px solid #e5eaf3', padding: '6px 12px', borderRadius: 6, fontSize: 12, cursor: 'pointer' }}>+ Add Revenue</button>
               </div>
             )}
 
