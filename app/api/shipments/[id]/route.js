@@ -57,14 +57,16 @@ export async function PUT(req, { params }) {
 
   await pool.query(
     `UPDATE shipments SET
-      pickup_warehouse_id=$1, delivery_warehouse_id=$2,
-      invoice_number=$3, invoice_amount=$4, insurance=$5,
-      product_description=$6, remarks=$7,
-      train_number=$8, train_date=$9, train_status=$10,
-      train_name=$11, origin_code=$12, dest_code=$13, origin_departure=$14, dest_eta=$15,
-      last_station=$16, delay_minutes=$17, costs=$18, revenues=$19
-     WHERE id=$20`,
+      customer_id=$1, vendor_id=$2,
+      pickup_warehouse_id=$3, delivery_warehouse_id=$4,
+      invoice_number=$5, invoice_amount=$6, insurance=$7,
+      product_description=$8, remarks=$9,
+      train_number=$10, train_date=$11, train_status=$12,
+      train_name=$13, origin_code=$14, dest_code=$15, origin_departure=$16, dest_eta=$17,
+      last_station=$18, delay_minutes=$19, costs=$20, revenues=$21
+     WHERE id=$22`,
     [
+      body.customerId, body.vendorId,
       body.pickupWarehouseId, body.deliveryWarehouseId,
       body.invoiceNumber, body.invoiceAmount, body.insurance,
       body.productDescription, body.remarks,
