@@ -1,4 +1,4 @@
-import { getShipments, addShipment, nextAWB } from '../../../lib/db';
+import { getShipments, addShipment, nextAWB, nextChildAWB } from '../../../lib/db';
 
 export async function GET() {
   const shipments = await getShipments();
@@ -10,12 +10,9 @@ export async function POST(req) {
   const master = await nextAWB();
   const totalBoxes = (body.boxes || []).reduce((s, b) => s + Number(b.count || 1), 0) || 1;
   const boxAWBs = [];
-  let current = parseInt(master, 10);
   for (let i = 0; i < totalBoxes; i++) {
-    // Skip numbers with zeros
-    while (String(current).includes('0')) current++;
-    boxAWBs.push(String(current));
-    current++;
+    const child = await nextChildAWB();
+    boxAWBs.push(child);
   }
   const shipment = await addShipment({
     ...body,
