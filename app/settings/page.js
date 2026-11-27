@@ -158,15 +158,15 @@ function CustomersTab() {
 
 function WarehousesTab() {
   const [items, setItems] = useState([]);
-  const [form, setForm] = useState({ name: '', consigneeName: '', companyName: '', address: '', city: '', state: '', pin: '', phone: '' });
+  const [form, setForm] = useState({ name: '', consigneeName: '', companyName: '', address: '', city: '', state: '', pin: '', phone: '', showPhoneOnLabel: false });
   const [editing, setEditing] = useState(null);
   const [show, setShow] = useState(false);
 
   const load = () => fetch('/api/warehouses').then(r => r.json()).then(setItems);
   useEffect(() => { load(); }, []);
 
-  const openNew = () => { setEditing(null); setForm({ name: '', consigneeName: '', companyName: '', address: '', city: '', state: '', pin: '', phone: '' }); setShow(true); };
-  const openEdit = (w) => { setEditing(w.id); setForm({ name: w.name, consigneeName: w.consigneeName, companyName: w.companyName, address: w.address, city: w.city, state: w.state, pin: w.pin, phone: w.phone }); setShow(true); };
+  const openNew = () => { setEditing(null); setForm({ name: '', consigneeName: '', companyName: '', address: '', city: '', state: '', pin: '', phone: '', showPhoneOnLabel: false }); setShow(true); };
+  const openEdit = (w) => { setEditing(w.id); setForm({ name: w.name, consigneeName: w.consigneeName, companyName: w.companyName, address: w.address, city: w.city, state: w.state, pin: w.pin, phone: w.phone, showPhoneOnLabel: w.showPhoneOnLabel }); setShow(true); };
 
   const save = async () => {
     if (editing) {
@@ -198,6 +198,10 @@ function WarehousesTab() {
           <input placeholder="PIN" value={form.pin} onChange={e => setForm({...form, pin: e.target.value})} style={inputStyle} />
           <input placeholder="Contact Name" value={form.pocName} onChange={e => setForm({...form, pocName: e.target.value})} style={inputStyle} />
           <input placeholder="Phone" value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} style={inputStyle} />
+          <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, marginBottom: 8 }}>
+            <input type="checkbox" checked={form.showPhoneOnLabel} onChange={e => setForm({...form, showPhoneOnLabel: e.target.checked})} />
+            Show phone on label
+          </label>
           <button onClick={save} style={btnPrimary}>Save</button>
           <button onClick={() => setShow(false)} style={btnSecondary}>Cancel</button>
         </div>
