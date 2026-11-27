@@ -26,9 +26,15 @@ async function fetchTrainDetails(trainNumber, date) {
     const json = await res.json();
     if (!json.success) return null;
     const d = json.data;
-    const first = d.stations?.[0];
+    const stations = d.stations || [];
+    const first = stations[0];
+    const last = stations[stations.length - 1];
     return {
       trainName: d.train_name || '',
+      originCode: first?.station_code || '',
+      originName: first?.station_name || '',
+      destCode: last?.station_code || '',
+      destName: last?.station_name || '',
       originDeparture: first?.scheduled_departure || first?.etd || '',
       destEta: d.eta_destination_at || '',
       lastStation: d.current_station_name || '',
@@ -55,9 +61,9 @@ export async function PUT(req, { params }) {
       invoice_number=$3, invoice_amount=$4, insurance=$5,
       product_description=$6, remarks=$7,
       train_number=$8, train_date=$9, train_status=$10,
-      train_name=$11, origin_departure=$12, dest_eta=$13,
+      train_name=$11, origin_code=$12, dest_code=$13, origin_departure=$14, dest_eta=$15,
       last_station=$14, delay_minutes=$15, costs=$16, revenues=$17
-     WHERE id=$18`,
+     WHERE id=$20`,
     [
       body.pickupWarehouseId, body.deliveryWarehouseId,
       body.invoiceNumber, body.invoiceAmount, body.insurance,
@@ -65,6 +71,8 @@ export async function PUT(req, { params }) {
       body.trainNumber, body.trainDate,
       trainDetails?.status || body.trainStatus || '',
       trainDetails?.trainName || '',
+      trainDetails?.originCode || '',
+      trainDetails?.destCode || '',
       trainDetails?.originDeparture || '',
       trainDetails?.destEta || '',
       trainDetails?.lastStation || '',
