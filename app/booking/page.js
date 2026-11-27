@@ -13,6 +13,12 @@ const sections = [
 
 export default function BookingPage() {
   const [open, setOpen] = useState('customer');
+  const [showAddCustomer, setShowAddCustomer] = useState(false);
+  const [showAddVendor, setShowAddVendor] = useState(false);
+  const [showAddWarehouse, setShowAddWarehouse] = useState(false);
+  const [newCustomer, setNewCustomer] = useState({ name: '', email: '', phone: '' });
+  const [newVendor, setNewVendor] = useState({ name: '', gst: '', phone: '', station: '' });
+  const [newWarehouse, setNewWarehouse] = useState({ name: '', consigneeName: '', companyName: '', address: '', city: '', pin: '', phone: '' });
   const [customers, setCustomers] = useState([]);
   const [warehouses, setWarehouses] = useState([]);
   
@@ -89,6 +95,15 @@ export default function BookingPage() {
                   <option value="">Select customer</option>
                   {customers.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                 </select>
+                <button onClick={() => setShowAddCustomer(!showAddCustomer)} style={{ marginTop: 8, background: 'none', border: 'none', color: '#0074ff', fontSize: 13, cursor: 'pointer' }}>+ Add New Customer</button>
+                {showAddCustomer && (
+                  <div style={{ marginTop: 8, padding: 12, background: '#f8fafc', borderRadius: 8 }}>
+                    <input placeholder="Name" value={newCustomer.name} onChange={e => setNewCustomer({...newCustomer, name: e.target.value})} style={{...input, marginBottom: 6}} />
+                    <input placeholder="Email" value={newCustomer.email} onChange={e => setNewCustomer({...newCustomer, email: e.target.value})} style={{...input, marginBottom: 6}} />
+                    <input placeholder="Phone" value={newCustomer.phone} onChange={e => setNewCustomer({...newCustomer, phone: e.target.value})} style={{...input, marginBottom: 6}} />
+                    <button onClick={addCustomer} style={{ background: '#0074ff', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: 6, fontSize: 13, cursor: 'pointer' }}>Save Customer</button>
+                  </div>
+                )}
               )}
               
               {s.id === 'vendor' && (
@@ -96,8 +111,33 @@ export default function BookingPage() {
                   <option value="">Select vendor</option>
                   {vendors.map(v => <option key={v.id} value={v.id}>{v.name}{v.station ? ` — ${v.station}` : ''}</option>)}
                 </select>
+                <button onClick={() => setShowAddVendor(!showAddVendor)} style={{ marginTop: 8, background: 'none', border: 'none', color: '#0074ff', fontSize: 13, cursor: 'pointer' }}>+ Add New Vendor</button>
+                {showAddVendor && (
+                  <div style={{ marginTop: 8, padding: 12, background: '#f8fafc', borderRadius: 8 }}>
+                    <input placeholder="Name" value={newVendor.name} onChange={e => setNewVendor({...newVendor, name: e.target.value})} style={{...input, marginBottom: 6}} />
+                    <input placeholder="GST" value={newVendor.gst} onChange={e => setNewVendor({...newVendor, gst: e.target.value})} style={{...input, marginBottom: 6}} />
+                    <input placeholder="Phone" value={newVendor.phone} onChange={e => setNewVendor({...newVendor, phone: e.target.value})} style={{...input, marginBottom: 6}} />
+                    <input placeholder="Station" value={newVendor.station} onChange={e => setNewVendor({...newVendor, station: e.target.value})} style={{...input, marginBottom: 6}} />
+                    <button onClick={addVendor} style={{ background: '#0074ff', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: 6, fontSize: 13, cursor: 'pointer' }}>Save Vendor</button>
+                  </div>
+                )}
               )}
               {s.id === 'hubs' && (
+                <div>
+                <button onClick={() => setShowAddWarehouse(!showAddWarehouse)} style={{ marginBottom: 8, background: 'none', border: 'none', color: '#0074ff', fontSize: 13, cursor: 'pointer' }}>+ Add New Hub/Warehouse</button>
+                {showAddWarehouse && (
+                  <div style={{ marginBottom: 12, padding: 12, background: '#f8fafc', borderRadius: 8 }}>
+                    <input placeholder="Hub Name" value={newWarehouse.name} onChange={e => setNewWarehouse({...newWarehouse, name: e.target.value})} style={{...input, marginBottom: 6}} />
+                    <input placeholder="Consignee Name" value={newWarehouse.consigneeName} onChange={e => setNewWarehouse({...newWarehouse, consigneeName: e.target.value})} style={{...input, marginBottom: 6}} />
+                    <input placeholder="Company Name" value={newWarehouse.companyName} onChange={e => setNewWarehouse({...newWarehouse, companyName: e.target.value})} style={{...input, marginBottom: 6}} />
+                    <input placeholder="Address" value={newWarehouse.address} onChange={e => setNewWarehouse({...newWarehouse, address: e.target.value})} style={{...input, marginBottom: 6}} />
+                    <input placeholder="City" value={newWarehouse.city} onChange={e => setNewWarehouse({...newWarehouse, city: e.target.value})} style={{...input, marginBottom: 6}} />
+                    <input placeholder="PIN" value={newWarehouse.pin} onChange={e => setNewWarehouse({...newWarehouse, pin: e.target.value})} style={{...input, marginBottom: 6}} />
+                    <input placeholder="Phone" value={newWarehouse.phone} onChange={e => setNewWarehouse({...newWarehouse, phone: e.target.value})} style={{...input, marginBottom: 6}} />
+                    <button onClick={addWarehouse} style={{ background: '#0074ff', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: 6, fontSize: 13, cursor: 'pointer' }}>Save Hub</button>
+                  </div>
+                )}
+
                 <>
                   <label style={label}>Pickup Hub (Consignor)</label>
                   <input style={input} placeholder="Search hub..." value={searchPickup} onChange={e => setSearchPickup(e.target.value)} />
@@ -110,7 +150,7 @@ export default function BookingPage() {
                     <div key={w.id} style={{ padding: 8, cursor: 'pointer', fontSize: 13 }} onClick={() => { setForm({...form, deliveryWarehouseId: w.id}); setSearchDelivery(w.name); }}>{w.name} — {w.city}</div>
                   ))}
                 </>
-              )}
+              </div>)}
               {s.id === 'shipment' && (
                 <>
                   {form.boxes.map((box, i) => (
