@@ -182,6 +182,7 @@ export default function ShipmentsPage() {
               <th style={th}>Train</th>
               <th style={th}>Boxes</th>
               <th style={th}>Status</th>
+              <th style={th}></th>
             </tr>
           </thead>
           <tbody>
@@ -201,6 +202,9 @@ export default function ShipmentsPage() {
                     background: s.trainStatus === 'delayed' ? '#fef3c7' : s.trainStatus === 'on-time' ? '#d1fae5' : s.trainStatus === 'delivered' ? '#dbeafe' : '#f1f5f9',
                     color: s.trainStatus === 'delayed' ? '#92400e' : s.trainStatus === 'on-time' ? '#065f46' : s.trainStatus === 'delivered' ? '#1e40af' : '#64748b',
                   }}>{s.trainStatus || 'booked'}</span>
+                </td>
+                <td style={td}>
+                  <a href={`/api/labels/${s.id}`} title="Download Labels" style={{ color: '#146bff', fontSize: 16 }}>⬇</a>
                 </td>
               </tr>
             ))}
@@ -233,6 +237,19 @@ export default function ShipmentsPage() {
 
             {tab === 'parties' && (
               <div>
+                <div style={{ background: '#f8fafc', borderRadius: 8, padding: 12, marginBottom: 16 }}>
+                  <div style={{ fontSize: 11, color: '#5b6b82', textTransform: 'uppercase' }}>Billing Customer</div>
+                  <div style={{ fontSize: 14, fontWeight: 600, color: '#0a1b3d', marginTop: 2 }}>{customerName(selected.customerId)}</div>
+                </div>
+                <div style={{ background: '#f8fafc', borderRadius: 8, padding: 12, marginBottom: 16 }}>
+                  <div style={{ fontSize: 11, color: '#5b6b82', textTransform: 'uppercase' }}>Vendor</div>
+                  <div style={{ fontSize: 14, fontWeight: 600, color: '#0a1b3d', marginTop: 2 }}>{vendorName(selected.vendorId)}</div>
+                </div>
+                <div style={{ background: '#f8fafc', borderRadius: 8, padding: 12, marginBottom: 16 }}>
+                  <div style={{ fontSize: 11, color: '#5b6b82', textTransform: 'uppercase' }}>AWB</div>
+                  <div style={{ fontSize: 14, fontWeight: 600, color: '#0a1b3d', marginTop: 2 }}>{selected.masterAWB}</div>
+                  <div style={{ fontSize: 12, color: '#5b6b82', marginTop: 2 }}>{formatDate(selected.createdAt)}</div>
+                </div>
                 <label style={labelStyle}>Pickup Warehouse</label>
                 <select value={edit.pickupWarehouseId || ''} onChange={e => setEdit({...edit, pickupWarehouseId: e.target.value})} style={inputStyle}>
                   <option value="">Select</option>
